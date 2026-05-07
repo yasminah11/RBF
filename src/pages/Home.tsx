@@ -1,0 +1,333 @@
+import { useEffect, useState, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useI18n, localizedField } from "@/i18n/I18nContext";
+import { ProductCard, type ProductCardData } from "@/components/ProductCard";
+import { Reveal } from "@/components/Reveal";
+import { Ornament } from "@/components/Ornament";
+import { categoryImg, header1, header2, coverEmail } from "@/lib/assets";
+import { Award, ShieldCheck, CreditCard, ArrowRight, Star } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_REVIEWS, type Category } from "@/lib/constants";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+
+export default function Home() {
+  const { t, locale } = useI18n();
+  const [featured, setFeatured] = useState<ProductCardData[]>([]);
+  const [newArrivals, setNewArrivals] = useState<ProductCardData[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+
+  const [emblaRef] = useEmblaCarousel({ loop: true, dragFree: true }, [
+    Autoplay({ delay: 3000, stopOnInteraction: false })
+  ]);
+
+  const heroImages = [header1, header2];
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const [{ data: feat }, { data: newer }, { data: cats }] = await Promise.all([
+          supabase.from("products").select("*").eq("is_featured", true).eq("is_active", true).limit(4),
+          supabase.from("products").select("*").eq("is_new_arrival", true).eq("is_active", true).limit(8),
+          supabase.from("categories").select("*").eq("is_active", true).order("display_order"),
+        ]);
+
+        setFeatured(feat && feat.length > 0 ? (feat as any) : MOCK_PRODUCTS.slice(0, 4));
+        setNewArrivals(newer && newer.length > 0 ? (newer as any) : MOCK_PRODUCTS.slice(0, 8));
+        setCategories(cats && cats.length > 0 ? (cats as any) : MOCK_CATEGORIES);
+      } catch (err) {
+        console.error("Supabase fetch failed, using mock data", err);
+        setFeatured(MOCK_PRODUCTS.slice(0, 4));
+        setNewArrivals(MOCK_PRODUCTS.slice(0, 8));
+        setCategories(MOCK_CATEGORIES);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
+    }, 4000); 
+    return () => clearInterval(timer);
+  }, [heroImages.length]);
+
+  const handleImageError = (index: number) => {
+    setImageErrors(prev => ({ ...prev, [index]: true }));
+  };
+
+  const titleWords = t.hero.title.split(' ');
+  const firstWord = titleWords[0];
+  const restOfTitle = titleWords.slice(1).join(' ');
+
+  return (
+    <div className="overflow-x-hidden">
+      {/* Hero Section */}
+      <section className="relative h-[85vh] md:h-screen flex items-center overflow-hidden md:-mt-[120px] bg-background">
+        <div className="absolute inset-0 z-0">
+          {heroImages.map((src, index) => (
+            <div
+              key={index}
+              className={cn(
+                "absolute inset-0 transition-opacity duration-1500 ease-in-out",
+                index === currentHeroIndex ? "opacity-100" : "opacity-0"
+              )}
+            >
+              <img
+                src={src}
+                alt={`Royal Brands Fashion luxury collection ${index + 1}`}
+                onError={() => handleImageError(index)}
+                className={cn(
+                  "w-full h-full object-cover object-center",
+                  index === currentHeroIndex && "animate-slow-zoom"
+                )}
+              />
+            </div>
+          ))}
+          <div className="absolute inset-0 bg-background/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/10 to-transparent md:from-background/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+        </div>
+
+        <div className="container-luxury relative z-10">
+          <div className="max-w-3xl">
+            <Reveal delay={200}>
+              <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
+                <div className="h-px w-8 md:w-12 bg-primary" />
+                <p className="text-[9px] md:text-xs uppercase tracking-[0.4em] md:tracking-[0.5em] text-primary font-semibold drop-shadow-md">
+                   {locale === "ar" ? "مجموعة 2026" : locale === "tr" ? "2026 Koleksiyonu" : "Collection 2026"}
+                </p>
+              </div>
+            </Reveal>
+            
+            <Reveal delay={400}>
+              <h1 className="font-display text-4xl sm:text-5xl md:text-8xl lg:text-9xl text-cream leading-[1.1] md:leading-[0.9] mb-6 md:mb-8 drop-shadow-lg">
+                <span className="text-shimmer block">{firstWord}</span>
+                {restOfTitle && <span className="block italic opacity-95">{restOfTitle}</span>}
+              </h1>
+            </Reveal>
+
+            <Reveal delay={600}>
+              <p className="text-sm md:text-xl text-foreground/90 mb-8 md:mb-10 max-w-lg leading-relaxed font-medium drop-shadow-md px-1 md:px-0">
+                {t.hero.subtitle}
+              </p>
+            </Reveal>
+
+            <Reveal delay={800}>
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
+                <Link
+                  to="/shop"
+                  className="group relative inline-flex items-center justify-center gap-4 bg-primary text-primary-foreground w-full sm:w-auto px-10 py-4 md:py-5 text-[10px] uppercase tracking-[0.3em] font-bold overflow-hidden transition-all hover:shadow-gold"
+                >
+                  <span className="relative z-10">{t.hero.cta}</span>
+                  <ArrowRight className="h-4 w-4 relative z-10 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+                  <div className="absolute inset-0 bg-primary-glow translate-y-full transition-transform group-hover:translate-y-0" />
+                </Link>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+
+        <div className="absolute bottom-10 right-6 md:bottom-24 md:right-10 flex flex-row md:flex-col gap-2 md:gap-3 z-20">
+          {heroImages.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentHeroIndex(i)}
+              className={cn(
+                "w-6 h-0.5 md:w-1 md:h-8 transition-all duration-500",
+                i === currentHeroIndex ? "bg-primary" : "bg-white/20 hover:bg-white/40"
+              )}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* Trust Section */}
+      <section className="relative z-20 border-y border-border/20 bg-card/30 backdrop-blur-sm">
+        <div className="container-luxury grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 md:divide-x divide-border/20">
+          {[
+            { icon: Award, label: t.trust.shipping },
+            { icon: ShieldCheck, label: t.trust.secure },
+            { icon: CreditCard, label: t.trust.cod, className: "sm:col-span-2 md:col-span-1" },
+          ].map((it, i) => (
+            <div key={i} className={cn("flex items-center justify-center gap-4 py-6 md:py-8 text-foreground/80 group hover:bg-primary/5 transition-colors", it.className)}>
+              <it.icon className="h-5 w-5 text-primary transition-transform group-hover:scale-110" />
+              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-medium">{it.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Best Sellers Section */}
+      <section className="container-luxury py-16 md:py-32">
+        <Reveal>
+          <div className="text-center mb-12 md:mb-20 px-4">
+            <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 md:mb-4 font-semibold">{t.common.featured}</p>
+            <h2 className="font-display text-3xl md:text-7xl text-cream mb-4 md:mb-6">{t.sections.bestsellers}</h2>
+            <Ornament className="mb-6 md:mb-8" />
+            <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto leading-relaxed italic">
+              {t.sections.bestsellersSub}
+            </p>
+          </div>
+        </Reveal>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-12">
+          {featured.map((p, i) => (
+            <Reveal key={p.id} delay={i * 100}>
+              <ProductCard p={p} />
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* Collection Types Section */}
+      <section className="bg-secondary/10 py-16 md:py-32">
+        <div className="container-luxury">
+          <Reveal>
+            <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16 gap-6 md:gap-8 px-4">
+              <div className="max-w-xl">
+                <h2 className="font-display text-3xl md:text-7xl text-cream mb-3 md:mb-4">{t.sections.categories}</h2>
+                <div className="h-0.5 md:h-1 w-12 md:w-20 bg-primary mb-4 md:mb-6" />
+                <p className="text-muted-foreground text-sm md:text-base">{t.sections.categoriesSub}</p>
+              </div>
+              <Link to="/shop" className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.3em] text-primary hover:text-primary-glow flex items-center gap-2 group transition-colors">
+                {t.common.viewAll} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
+          </Reveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+            {categories.map((c, i) => (
+              <Reveal key={c.id} delay={i * 150}>
+                <Link to={`/category/${c.slug}`} className="group relative block aspect-[4/5] overflow-hidden bg-background">
+                  <img
+                    src={categoryImg(c.slug)}
+                    alt={localizedField(c, "name", locale)}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                  <div className="absolute inset-0 border border-primary/0 group-hover:border-primary/20 transition-all m-3 md:m-4" />
+                  <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 transform translate-y-2 md:translate-y-4 group-hover:translate-y-0 transition-transform">
+                    <h3 className="font-display text-2xl md:text-4xl text-cream mb-2 md:mb-3">{localizedField(c, "name", locale)}</h3>
+                    <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary opacity-0 group-hover:opacity-100 transition-all duration-500">
+                      Explore Collection
+                    </span>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* New Arrivals Section */}
+      <section className="container-luxury py-16 md:py-32">
+        <Reveal>
+          <div className="flex items-center gap-4 md:gap-8 mb-10 md:mb-16 px-4">
+            <h2 className="font-display text-3xl md:text-6xl text-cream whitespace-nowrap">{t.sections.newArrivals}</h2>
+            <div className="h-px w-full bg-border/20" />
+            <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary whitespace-nowrap font-bold">{t.common.new}</p>
+          </div>
+        </Reveal>
+        <div className="flex gap-4 md:gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 lg:grid lg:grid-cols-4">
+          {newArrivals.map((p, i) => (
+            <div key={p.id} className="snap-start min-w-[240px] md:min-w-[300px] lg:min-w-0">
+              <Reveal delay={i * 80}><ProductCard p={p} /></Reveal>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Enhanced Responsive Newsletter Section */}
+      <section className="relative min-h-[60vh] md:min-h-[50vh] flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={coverEmail} 
+            alt="Royal World" 
+            className="w-full h-full object-cover object-[center_30%] md:object-center"
+          />
+          <div className="absolute inset-0 bg-background/40 md:bg-background/50" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background/60" />
+        </div>
+
+        <div className="container-luxury relative z-10 w-full py-16 md:py-24">
+          <Reveal>
+            <div className="max-w-2xl mx-auto text-center px-4">
+              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary font-bold mb-4 drop-shadow-md">
+                {t.sections.newsletterTag}
+              </p>
+              <h2 className="font-display text-3xl md:text-6xl lg:text-7xl text-cream mb-4 tracking-tight leading-tight drop-shadow-lg">
+                {t.sections.newsletter}
+              </h2>
+              <p className="text-foreground/90 mb-10 max-w-md mx-auto leading-relaxed italic text-sm md:text-lg drop-shadow-sm font-light">
+                {t.sections.newsletterSub}
+              </p>
+              
+              <form
+                onSubmit={(e) => e.preventDefault()}
+                className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto border border-primary/30 rounded-none overflow-hidden bg-background/30 backdrop-blur-md shadow-2xl"
+              >
+                <input
+                  type="email"
+                  placeholder={t.footer.emailPh}
+                  className="flex-1 bg-transparent border-none px-6 py-4 text-sm text-cream placeholder:text-cream/50 focus:outline-none focus:ring-0 transition-all text-center sm:text-start"
+                />
+                <button className="bg-primary text-primary-foreground px-8 py-4 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20">
+                  {t.footer.subscribe}
+                </button>
+              </form>
+              
+              <p className="mt-8 text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground/90 font-medium">
+                {t.sections.newsletterFoot}
+              </p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-16 md:py-24 bg-background border-t border-border/10 overflow-hidden">
+        <div className="container-luxury">
+          <Reveal>
+            <div className="text-center mb-10 md:mb-12">
+              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary mb-3 font-bold">{t.sections.reviewsTag}</p>
+              <h2 className="font-display text-3xl md:text-5xl text-cream leading-tight">{t.sections.reviews}</h2>
+              <Ornament className="mt-4" />
+            </div>
+          </Reveal>
+
+          <div className="max-w-3xl mx-auto px-6">
+            <div className="overflow-hidden" ref={emblaRef}>
+              <div className="flex touch-pan-y">
+                {MOCK_REVIEWS.map((review) => (
+                  <div key={review.id} className="flex-[0_0_100%] min-w-0 px-4">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="flex gap-1 mb-6">
+                        {[...Array(review.rating)].map((_, i) => (
+                          <Star key={i} className="h-3.5 w-3.5 fill-primary text-primary" />
+                        ))}
+                      </div>
+                      <blockquote className="font-display text-lg md:text-2xl text-cream/90 leading-relaxed italic mb-6 px-4">
+                        "{localizedField(review, "text", locale)}"
+                      </blockquote>
+                      <cite className="not-italic">
+                        <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-primary font-bold block mb-1">
+                          {review.name}
+                        </span>
+                        <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">
+                          {t.sections.verified}
+                        </span>
+                      </cite>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

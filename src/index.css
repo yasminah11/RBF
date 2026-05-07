@@ -1,0 +1,190 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   Royal Brands Fashion — Luxury Design System
+   Deep Navy + Rich Gold. All colors HSL.
+   ========================================================================== */
+@layer base {
+  :root {
+    /* Brand palette */
+    --background: 217 63% 11%;          /* #0B1A30 deep navy */
+    --foreground: 42 60% 92%;           /* soft cream */
+
+    --card: 217 49% 16%;                /* #112240 dark navy card */
+    --card-foreground: 42 60% 92%;
+
+    --popover: 217 49% 16%;
+    --popover-foreground: 42 60% 92%;
+
+    --primary: 43 53% 54%;              /* #C9A84C rich gold */
+    --primary-foreground: 217 63% 11%;
+    --primary-glow: 43 70% 70%;         /* #E8C97A */
+
+    --secondary: 217 49% 20%;
+    --secondary-foreground: 42 60% 92%;
+
+    --muted: 217 40% 22%;
+    --muted-foreground: 42 25% 75%;
+
+    --accent: 43 53% 54%;
+    --accent-foreground: 217 63% 11%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 39 50% 36%;               /* #8A6E2F muted gold */
+    --input: 217 40% 22%;
+    --ring: 43 53% 54%;
+
+    --radius: 0.25rem;
+
+    /* Cream surfaces */
+    --cream: 42 60% 92%;                /* #F5EFE0 */
+    --cream-foreground: 217 63% 11%;
+
+    /* Gradients */
+    --gradient-gold: linear-gradient(135deg, hsl(43 53% 54%), hsl(43 70% 70%));
+    --gradient-navy: linear-gradient(180deg, hsl(217 63% 11%), hsl(217 49% 16%));
+    --gradient-shimmer: linear-gradient(
+      90deg,
+      hsl(43 53% 54%) 0%,
+      hsl(43 80% 78%) 50%,
+      hsl(43 53% 54%) 100%
+    );
+
+    /* Shadows */
+    --shadow-gold: 0 8px 32px -8px hsl(43 53% 54% / 0.35);
+    --shadow-card: 0 6px 24px -10px hsl(217 80% 4% / 0.7);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    font-family: 'Jost', system-ui, sans-serif;
+  }
+  html[lang="ar"] {
+    font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "ss02";
+  }
+  h1, h2, h3, h4, h5, .font-display {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  html[lang="ar"] h1,
+  html[lang="ar"] h2,
+  html[lang="ar"] h3,
+  html[lang="ar"] h4,
+  html[lang="ar"] h5,
+  html[lang="ar"] .font-display {
+    font-family: 'IBM Plex Sans Arabic', serif;
+    font-weight: 500;
+  }
+}
+
+/* ==========================================================================
+   Components & Utilities
+   ========================================================================== */
+@layer components {
+  /* Ornamental gold divider */
+  .divider-ornament {
+    @apply flex items-center justify-center gap-4 py-8;
+  }
+  .divider-ornament::before,
+  .divider-ornament::after {
+    content: "";
+    @apply h-px flex-1 max-w-[120px];
+    background: linear-gradient(
+      to right,
+      transparent,
+      hsl(var(--primary) / 0.6),
+      transparent
+    );
+  }
+  .divider-ornament > svg {
+    @apply text-primary;
+  }
+
+  /* Gold shimmer on text */
+  .text-shimmer {
+    background: var(--gradient-shimmer);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+  }
+
+  /* Nav link gold underline */
+  .nav-link {
+    @apply relative inline-block py-1 text-sm uppercase tracking-[0.18em] text-foreground/85 transition-all duration-300 hover:text-primary hover:-translate-y-0.5;
+  }
+  .nav-link::after {
+    content: "";
+    @apply absolute bottom-0 start-0 h-px w-0 bg-primary transition-all duration-500 ease-luxury;
+  }
+  .nav-link:hover::after,
+  .nav-link[data-active="true"]::after {
+    @apply w-full;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  /* Product card */
+  .product-card {
+    @apply relative overflow-hidden bg-card border border-transparent transition-all duration-500 flex flex-col h-full;
+  }
+  .product-card:hover {
+    @apply border-primary/60;
+    box-shadow: var(--shadow-gold);
+  }
+  .product-card-img {
+    @apply transition-transform duration-700 ease-out;
+  }
+  .product-card:hover .product-card-img {
+    transform: scale(1.04);
+  }
+  .product-card-info {
+    @apply p-4 text-center flex-1 flex flex-col justify-between;
+  }
+  .product-card-title {
+    @apply font-display text-base md:text-xl text-cream mb-1.5 leading-tight transition-colors duration-300 line-clamp-2 min-h-[3rem] md:min-h-[3.5rem];
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    @apply transition-all duration-700 ease-luxury;
+  }
+  .reveal.in-view {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer utilities {
+  .container-luxury {
+    @apply mx-auto w-full max-w-[1400px] px-6 md:px-10;
+  }
+  .text-cream { color: hsl(var(--cream)); }
+  .bg-cream { background-color: hsl(var(--cream)); }
+}
+
+@keyframes shimmer {
+  to { background-position: 200% center; }
+}
+
+/* RTL adjustments */
+html[dir="rtl"] .nav-link::after {
+  @apply right-0 left-auto;
+}
