@@ -6,10 +6,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/I18nContext";
 
 type AuthMode = "login" | "register";
 
 export default function Auth() {
+  const { t } = useI18n();
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,16 +26,6 @@ export default function Auth() {
     const inputEmail = email.trim().toLowerCase();
     const inputPassword = password.trim();
 
-    // ADMIN BYPASS: Allow administrators to log in via the main Auth page
-    if (inputPassword.toLowerCase() === "admin123") {
-      localStorage.setItem("rbf_admin_auth", "true");
-      toast.success("Welcome, Administrator", {
-        description: "Accessing the management portal."
-      });
-      window.location.href = "/admin/dashboard";
-      return;
-    }
-    
     try {
       if (mode === "register") {
         const { data, error } = await supabase.auth.signUp({
@@ -49,8 +41,8 @@ export default function Auth() {
         if (error) throw error;
         
         if (data.user) {
-          toast.success("Account Created", {
-            description: "Welcome to Royal Brands Fashion. Please verify your email."
+          toast.success((t as any).auth.accountCreated, {
+            description: (t as any).auth.verifyEmail
           });
           setMode("login");
         }
@@ -63,15 +55,15 @@ export default function Auth() {
         if (error) throw error;
 
         if (data.user) {
-          toast.success("Welcome Back", {
-            description: "Accessing your personal boutique."
+          toast.success((t as any).auth.welcomeBack, {
+            description: (t as any).auth.personalBoutique
           });
           navigate("/");
         }
       }
     } catch (error: any) {
-      toast.error("Authentication Failed", {
-        description: error.message || "Please verify your credentials and try again."
+      toast.error((t as any).auth.failed, {
+        description: error.message || (t as any).auth.invalid
       });
     } finally {
       setLoading(false);
@@ -92,10 +84,10 @@ export default function Auth() {
             {mode === "login" ? <User className="text-primary w-8 h-8" /> : <UserPlus className="text-primary w-8 h-8" />}
           </div>
           <p className="text-[10px] uppercase tracking-[0.4em] text-primary mb-3 font-bold">
-            {mode === "login" ? "Boutique Access" : "Join the Maison"}
+            {mode === "login" ? (t as any).auth.loginTag : (t as any).auth.registerTag}
           </p>
           <h1 className="font-display text-4xl text-cream">
-            {mode === "login" ? "Sign In" : "Register"}
+            {mode === "login" ? (t as any).auth.loginTitle : (t as any).auth.registerTitle}
           </h1>
           <Ornament className="mt-4" />
         </div>
@@ -109,7 +101,7 @@ export default function Auth() {
                 exit={{ opacity: 0, height: 0 }}
                 className="space-y-2 overflow-hidden"
               >
-                <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Full Name</label>
+                <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">{(t as any).auth.fullName}</label>
                 <div className="relative group">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                   <input 
@@ -126,7 +118,7 @@ export default function Auth() {
           </AnimatePresence>
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Email Address</label>
+            <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">{(t as any).auth.email}</label>
             <div className="relative group">
               <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input 
@@ -141,7 +133,7 @@ export default function Auth() {
           </div>
 
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">Password</label>
+            <label className="text-[10px] uppercase tracking-widest text-muted-foreground ml-1">{(t as any).auth.password}</label>
             <div className="relative group">
               <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
               <input 
@@ -163,7 +155,7 @@ export default function Auth() {
               <Loader2 className="h-4 w-4 animate-spin mx-auto relative z-10" />
             ) : (
               <div className="flex items-center justify-center gap-3 relative z-10">
-                <span>{mode === "login" ? "Sign In" : "Create Account"}</span>
+                <span>{mode === "login" ? (t as any).auth.signInBtn : (t as any).auth.createAccountBtn}</span>
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </div>
             )}
@@ -176,12 +168,12 @@ export default function Auth() {
             onClick={() => setMode(mode === "login" ? "register" : "login")}
             className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
           >
-            {mode === "login" ? "New to Royal Brands? Register Here" : "Already a client? Sign In"}
+            {mode === "login" ? (t as any).auth.noAccount : (t as any).auth.hasAccount}
           </button>
         </div>
 
         <p className="mt-10 text-center text-[9px] uppercase tracking-[0.2em] text-muted-foreground">
-          Luxury experience awaits. By continuing you agree to our terms.
+          {(t as any).auth.terms}
         </p>
       </motion.div>
     </div>

@@ -12,7 +12,6 @@ import catDresses_raw from "../assets/cat-dresses.jpg";
 import catOuterwear_raw from "../assets/cat-outerwear.jpg";
 import catAccessories_raw from "../assets/cat-accessories.jpg";
 import header1_raw from "../assets/header1.jpg";
-import header2_raw from "../assets/header2.jpg";
 import coverEmail_raw from "../assets/coverEmail.png";
 
 // Helper to ensure we get a string URL regardless of how Vite imports it
@@ -36,7 +35,6 @@ export const catDresses = resolve(catDresses_raw);
 export const catOuterwear = resolve(catOuterwear_raw);
 export const catAccessories = resolve(catAccessories_raw);
 export const header1 = resolve(header1_raw);
-export const header2 = resolve(header2_raw);
 export const coverEmail = resolve(coverEmail_raw);
 
 // SKU to Image Mapping (Case-insensitive)

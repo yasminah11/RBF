@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n, localizedField } from "@/i18n/I18nContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
@@ -9,6 +9,8 @@ import { MOCK_PRODUCTS, MOCK_CATEGORIES } from "@/lib/constants";
 
 export default function Shop() {
   const { slug } = useParams();
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get("search");
   const { t, locale } = useI18n();
   const [products, setProducts] = useState<ProductCardData[]>([]);
   const [categoryName, setCategoryName] = useState<string>("");
@@ -29,12 +31,18 @@ export default function Shop() {
              const mockCat = MOCK_CATEGORIES.find(c => c.slug === slug);
              setCategoryName(mockCat ? localizedField(mockCat, "name", locale) : slug);
           }
+        } else if (searchQuery) {
+          setCategoryName(`${t.common.search}: ${searchQuery}`);
         } else {
           setCategoryName(t.nav.shop);
         }
 
         let q = supabase.from("products").select("*").eq("is_active", true);
         if (categoryId) q = q.eq("category_id", categoryId);
+        
+        if (searchQuery) {
+          q = q.or(`name_en.ilike.%${searchQuery}%,name_tr.ilike.%${searchQuery}%,name_ar.ilike.%${searchQuery}%,description_en.ilike.%${searchQuery}%`);
+        }
         
         if (sort === "newest") q = q.order("created_at", { ascending: false });
         else if (sort === "price_asc") q = q.order("price", { ascending: true });
@@ -45,18 +53,27 @@ export default function Shop() {
         if (data && data.length > 0) {
           setProducts(data as any);
         } else {
+          let baseProducts = MOCK_PRODUCTS;
           if (slug) {
-            const filtered = MOCK_PRODUCTS.filter(p => {
+            baseProducts = MOCK_PRODUCTS.filter(p => {
               if (slug === 'long-evening-dresses') return p.slug.includes('long');
               if (slug === 'short-evening-dresses') return p.slug.includes('short');
               if (slug === 'graduation-evening-dresses') return p.slug.includes('graduation');
               if (slug === 'mermaid-style-evening-dresses') return p.slug.includes('mermaid');
               return true;
             });
-            setProducts(filtered);
-          } else {
-            setProducts(MOCK_PRODUCTS);
           }
+          
+          if (searchQuery) {
+            const lowerQuery = searchQuery.toLowerCase();
+            baseProducts = baseProducts.filter(p => 
+              p.name_en.toLowerCase().includes(lowerQuery) || 
+              p.name_tr.toLowerCase().includes(lowerQuery) || 
+              p.name_ar.includes(lowerQuery)
+            );
+          }
+          
+          setProducts(baseProducts);
         }
       } catch (err) {
         setProducts(MOCK_PRODUCTS);
@@ -64,7 +81,7 @@ export default function Shop() {
         setLoading(false);
       }
     })();
-  }, [slug, locale, sort, t.nav.shop]);
+  }, [slug, searchQuery, locale, sort, t.nav.shop, t.common.search]);
 
   return (
     <div className="container-luxury py-10 md:py-16">
@@ -105,7 +122,9 @@ export default function Shop() {
 
           {products.length === 0 && (
             <div className="text-center py-24">
-              <p className="text-muted-foreground italic">No products found in this category.</p>
+              <p className="text-muted-foreground italic">
+                {locale === "ar" ? "لم يتم العثور على منتجات." : locale === "tr" ? "Ürün bulunamadı." : "No products found."}
+              </p>
             </div>
           )}
         </>

@@ -1,63 +1,14 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Instagram, Facebook, Youtube, Send, Loader2 } from "lucide-react";
+import { Instagram, Facebook, Youtube } from "lucide-react";
 import { useI18n } from "@/i18n/I18nContext";
 import { Ornament } from "./Ornament";
-import { apiClient } from "@/lib/api-client";
-import { toast } from "sonner";
 
 export function Footer() {
   const { t } = useI18n();
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const handleSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    
-    setLoading(true);
-    const response = await apiClient.subscribeToNewsletter(email);
-    
-    if (response.success) {
-      toast.success("Subscribed Successfully", {
-        description: "Welcome to the Royal Circle. You will receive our latest updates soon."
-      });
-      setEmail("");
-    } else {
-      toast.error("Subscription Failed", {
-        description: response.error || "Please try again later."
-      });
-    }
-    setLoading(false);
-  };
 
   return (
     <footer className="bg-card mt-24 border-t border-border/40">
       <div className="container-luxury py-16 px-6">
-        {/* Newsletter Section */}
-        <div className="max-w-4xl mx-auto mb-20 text-center">
-          <h3 className="font-display text-3xl text-cream mb-4 uppercase tracking-[0.1em]">Join the Royal Circle</h3>
-          <p className="text-sm text-muted-foreground mb-8 max-w-lg mx-auto italic">
-            Receive exclusive early access to new collections, private sales, and sartorial inspirations.
-          </p>
-          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
-            <input 
-              type="email" 
-              placeholder="Your Email Address" 
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 bg-background/40 border border-primary/10 px-6 py-4 text-sm focus:outline-none focus:border-primary transition-all text-cream rounded-none"
-            />
-            <button 
-              disabled={loading}
-              className="bg-primary text-primary-foreground px-8 py-4 text-[10px] uppercase tracking-[0.2em] font-bold transition-all hover:shadow-gold disabled:opacity-50"
-            >
-              {loading ? <Loader2 className="h-4 w-4 animate-spin mx-auto" /> : "Subscribe"}
-            </button>
-          </form>
-        </div>
-
         <div className="flex flex-col items-center mb-12">
           <div className="w-12 h-12 border border-primary flex items-center justify-center mb-4">
             <span className="font-display text-lg text-primary">RBF</span>

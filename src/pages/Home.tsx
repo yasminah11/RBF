@@ -5,9 +5,10 @@ import { useI18n, localizedField } from "@/i18n/I18nContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
 import { Ornament } from "@/components/Ornament";
-import { categoryImg, header1, header2, coverEmail } from "@/lib/assets";
+import { categoryImg, header1, coverEmail } from "@/lib/assets";
 import { Award, ShieldCheck, CreditCard, ArrowRight, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_REVIEWS, type Category } from "@/lib/constants";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -17,14 +18,33 @@ export default function Home() {
   const [featured, setFeatured] = useState<ProductCardData[]>([]);
   const [newArrivals, setNewArrivals] = useState<ProductCardData[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
-  const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const [emblaRef] = useEmblaCarousel({ loop: true, dragFree: true }, [
+  // 1. Embla for Hero (3s Autoplay, Swipe enabled)
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true, 
+    duration: 30,
+    skipSnaps: false 
+  }, [
     Autoplay({ delay: 3000, stopOnInteraction: false })
   ]);
 
-  const heroImages = [header1, header2];
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    emblaApi.on("reInit", onSelect);
+  }, [emblaApi, onSelect]);
+
+  // 2. Embla for Testimonials
+  const [reviewsRef] = useEmblaCarousel({ loop: true, dragFree: true }, [
+    Autoplay({ delay: 5000, stopOnInteraction: false })
+  ]);
 
   useEffect(() => {
     (async () => {
@@ -47,56 +67,77 @@ export default function Home() {
     })();
   }, []);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroImages.length);
-    }, 4000); 
-    return () => clearInterval(timer);
-  }, [heroImages.length]);
-
-  const handleImageError = (index: number) => {
-    setImageErrors(prev => ({ ...prev, [index]: true }));
-  };
-
   const titleWords = t.hero.title.split(' ');
   const firstWord = titleWords[0];
   const restOfTitle = titleWords.slice(1).join(' ');
 
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const onSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || submitting) return;
+    
+    setSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from('subscribers')
+        .insert([{ email }]);
+
+      if (error) {
+        if (error.code === '23505') throw new Error(locale === 'ar' ? 'أنتِ مشتركة بالفعل!' : locale === 'tr' ? 'Zaten abonesiniz!' : 'You are already subscribed!');
+        throw error;
+      }
+      
+      toast.success(locale === 'ar' ? 'تم الانضمام بنجاح!' : locale === 'tr' ? 'Topluluğumuza katıldınız!' : 'Successfully joined our community!', {
+        description: locale === 'ar' ? 'تفقدي بريدك الإلكتروني للحصول على مفاجأة.' : 'Check your email for a welcome surprise.'
+      });
+      setEmail("");
+    } catch (err: any) {
+      console.error(err);
+      toast.error(locale === 'ar' ? 'فشل الاشتراك' : locale === 'tr' ? 'Abonelik başarısız' : 'Subscription failed', {
+        description: err.message || 'Something went wrong.'
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const heroImages = [header1];
+
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative h-[85vh] md:h-screen flex items-center overflow-hidden md:-mt-[120px] bg-background">
-        <div className="absolute inset-0 z-0">
-          {heroImages.map((src, index) => (
-            <div
-              key={index}
-              className={cn(
-                "absolute inset-0 transition-opacity duration-1500 ease-in-out",
-                index === currentHeroIndex ? "opacity-100" : "opacity-0"
-              )}
-            >
-              <img
-                src={src}
-                alt={`Royal Brands Fashion luxury collection ${index + 1}`}
-                onError={() => handleImageError(index)}
-                className={cn(
-                  "w-full h-full object-cover object-center",
-                  index === currentHeroIndex && "animate-slow-zoom"
-                )}
-              />
-            </div>
-          ))}
-          <div className="absolute inset-0 bg-background/20" />
-          <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/10 to-transparent md:from-background/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+      <section className="relative h-[85vh] md:h-screen overflow-hidden md:-mt-[120px] bg-background">
+        {/* Carousel Container */}
+        <div className="absolute inset-0 z-0 overflow-hidden" ref={emblaRef}>
+          <div className="flex h-full">
+            {heroImages.map((src, index) => (
+              <div key={index} className="relative flex-[0_0_100%] h-full">
+                <img
+                  src={src}
+                  alt={`Royal Brands Fashion luxury collection ${index + 1}`}
+                  className="w-full h-full object-cover object-center animate-slow-zoom"
+                />
+              </div>
+            ))}
+          </div>
+          
+          {/* Static Content Overlay (On top of carousel) */}
+          <div className="absolute inset-0 z-10 pointer-events-none">
+            <div className="absolute inset-0 bg-background/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background/60 via-background/10 to-transparent md:from-background/40" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent" />
+          </div>
         </div>
 
-        <div className="container-luxury relative z-10">
-          <div className="max-w-3xl">
+        {/* Hero Content (Static) */}
+        <div className="container-luxury relative z-20 h-full flex items-center pointer-events-none">
+          <div className="max-w-3xl pointer-events-auto">
             <Reveal delay={200}>
               <div className="flex items-center gap-3 md:gap-4 mb-4 md:mb-6">
                 <div className="h-px w-8 md:w-12 bg-primary" />
-                <p className="text-[9px] md:text-xs uppercase tracking-[0.4em] md:tracking-[0.5em] text-primary font-semibold drop-shadow-md">
+                <p className="text-[9px] md:text-xs uppercase tracking-[0.4em] md:tracking-[0.5em] text-primary font-normal drop-shadow-md">
                    {locale === "ar" ? "مجموعة 2026" : locale === "tr" ? "2026 Koleksiyonu" : "Collection 2026"}
                 </p>
               </div>
@@ -110,7 +151,7 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={600}>
-              <p className="text-sm md:text-xl text-foreground/90 mb-8 md:mb-10 max-w-lg leading-relaxed font-medium drop-shadow-md px-1 md:px-0">
+              <p className="text-sm md:text-xl text-foreground/90 mb-8 md:mb-10 max-w-lg leading-relaxed font-normal drop-shadow-md px-1 md:px-0">
                 {t.hero.subtitle}
               </p>
             </Reveal>
@@ -130,32 +171,31 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="absolute bottom-10 right-6 md:bottom-24 md:right-10 flex flex-row md:flex-col gap-2 md:gap-3 z-20">
+        {/* Visual Indicator (The indicator to show it swaps) */}
+        <div className="absolute bottom-10 right-10 z-30 flex gap-2">
           {heroImages.map((_, i) => (
-            <button
+            <div 
               key={i}
-              onClick={() => setCurrentHeroIndex(i)}
               className={cn(
-                "w-6 h-0.5 md:w-1 md:h-8 transition-all duration-500",
-                i === currentHeroIndex ? "bg-primary" : "bg-white/20 hover:bg-white/40"
+                "h-0.5 transition-all duration-500",
+                i === selectedIndex ? "w-8 bg-primary" : "w-4 bg-white/30"
               )}
-              aria-label={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
       </section>
 
       {/* Trust Section */}
-      <section className="relative z-20 border-y border-border/20 bg-card/30 backdrop-blur-sm">
+      <section className="relative z-20 border-y border-border/20 bg-card/30 backdrop-blur-sm shadow-xl">
         <div className="container-luxury grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 divide-y sm:divide-y-0 md:divide-x divide-border/20">
           {[
             { icon: Award, label: t.trust.shipping },
             { icon: ShieldCheck, label: t.trust.secure },
             { icon: CreditCard, label: t.trust.cod, className: "sm:col-span-2 md:col-span-1" },
           ].map((it, i) => (
-            <div key={i} className={cn("flex items-center justify-center gap-4 py-6 md:py-8 text-foreground/80 group hover:bg-primary/5 transition-colors", it.className)}>
-              <it.icon className="h-5 w-5 text-primary transition-transform group-hover:scale-110" />
-              <span className="text-[9px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.25em] font-medium">{it.label}</span>
+            <div key={i} className={cn("flex items-center justify-center gap-5 py-8 md:py-12 text-foreground/90 group hover:bg-primary/5 transition-all duration-500", it.className)}>
+              <it.icon className="h-6 w-6 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+              <span className="text-[10px] md:text-[12px] uppercase tracking-[0.3em] md:tracking-[0.4em] font-normal">{it.label}</span>
             </div>
           ))}
         </div>
@@ -165,7 +205,7 @@ export default function Home() {
       <section className="container-luxury py-16 md:py-32">
         <Reveal>
           <div className="text-center mb-12 md:mb-20 px-4">
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 md:mb-4 font-semibold">{t.common.featured}</p>
+            <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 md:mb-4 font-normal">{t.common.featured}</p>
             <h2 className="font-display text-3xl md:text-7xl text-cream mb-4 md:mb-6">{t.sections.bestsellers}</h2>
             <Ornament className="mb-6 md:mb-8" />
             <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto leading-relaxed italic">
@@ -228,7 +268,7 @@ export default function Home() {
           <div className="flex items-center gap-4 md:gap-8 mb-10 md:mb-16 px-4">
             <h2 className="font-display text-3xl md:text-6xl text-cream whitespace-nowrap">{t.sections.newArrivals}</h2>
             <div className="h-px w-full bg-border/20" />
-            <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary whitespace-nowrap font-bold">{t.common.new}</p>
+            <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary whitespace-nowrap font-normal">{t.common.new}</p>
           </div>
         </Reveal>
         <div className="flex gap-4 md:gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 lg:grid lg:grid-cols-4">
@@ -255,7 +295,7 @@ export default function Home() {
         <div className="container-luxury relative z-10 w-full py-16 md:py-24">
           <Reveal>
             <div className="max-w-2xl mx-auto text-center px-4">
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary font-bold mb-4 drop-shadow-md">
+              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary font-normal mb-4 drop-shadow-md">
                 {t.sections.newsletterTag}
               </p>
               <h2 className="font-display text-3xl md:text-6xl lg:text-7xl text-cream mb-4 tracking-tight leading-tight drop-shadow-lg">
@@ -266,16 +306,22 @@ export default function Home() {
               </p>
               
               <form
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={onSubscribe}
                 className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto border border-primary/30 rounded-none overflow-hidden bg-background/30 backdrop-blur-md shadow-2xl"
               >
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.footer.emailPh}
                   className="flex-1 bg-transparent border-none px-6 py-4 text-sm text-cream placeholder:text-cream/50 focus:outline-none focus:ring-0 transition-all text-center sm:text-start"
                 />
-                <button className="bg-primary text-primary-foreground px-8 py-4 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20">
-                  {t.footer.subscribe}
+                <button 
+                  type="submit"
+                  disabled={submitting}
+                  className="bg-primary text-primary-foreground px-8 py-4 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20 disabled:opacity-50"
+                >
+                  {submitting ? '...' : t.footer.subscribe}
                 </button>
               </form>
               
@@ -292,14 +338,14 @@ export default function Home() {
         <div className="container-luxury">
           <Reveal>
             <div className="text-center mb-10 md:mb-12">
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary mb-3 font-bold">{t.sections.reviewsTag}</p>
+              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary mb-3 font-normal">{t.sections.reviewsTag}</p>
               <h2 className="font-display text-3xl md:text-5xl text-cream leading-tight">{t.sections.reviews}</h2>
               <Ornament className="mt-4" />
             </div>
           </Reveal>
 
           <div className="max-w-3xl mx-auto px-6">
-            <div className="overflow-hidden" ref={emblaRef}>
+            <div className="overflow-hidden" ref={reviewsRef}>
               <div className="flex touch-pan-y">
                 {MOCK_REVIEWS.map((review) => (
                   <div key={review.id} className="flex-[0_0_100%] min-w-0 px-4">
@@ -313,7 +359,7 @@ export default function Home() {
                         "{localizedField(review, "text", locale)}"
                       </blockquote>
                       <cite className="not-italic">
-                        <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-primary font-bold block mb-1">
+                        <span className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-primary font-normal block mb-1">
                           {review.name}
                         </span>
                         <span className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground opacity-60">

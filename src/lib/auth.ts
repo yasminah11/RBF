@@ -37,11 +37,5 @@ export const authService = {
 
   async signOut() {
     await supabase.auth.signOut();
-    localStorage.removeItem("rbf_admin_auth");
-  },
-
-  async isAdmin(): Promise<boolean> {
-    const user = await this.getCurrentUser();
-    return user?.role === "admin";
   }
 };
