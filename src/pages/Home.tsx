@@ -144,26 +144,26 @@ export default function Home() {
             </Reveal>
             
             <Reveal delay={400}>
-              <h1 className="font-display text-4xl sm:text-5xl md:text-8xl lg:text-9xl text-cream leading-[1.1] md:leading-[0.9] mb-6 md:mb-8 drop-shadow-lg">
+              <h1 className="font-display text-5xl sm:text-5xl md:text-8xl lg:text-9xl text-cream leading-[1.15] md:leading-[0.9] mb-6 md:mb-8 drop-shadow-lg">
                 <span className="text-shimmer block">{firstWord}</span>
                 {restOfTitle && <span className="block italic opacity-95">{restOfTitle}</span>}
               </h1>
             </Reveal>
 
             <Reveal delay={600}>
-              <p className="text-sm md:text-xl text-foreground/90 mb-8 md:mb-10 max-w-lg leading-relaxed font-normal drop-shadow-md px-1 md:px-0">
+              <p className="text-base md:text-xl text-foreground/90 mb-8 md:mb-10 max-w-lg leading-relaxed font-normal drop-shadow-md px-1 md:px-0">
                 {t.hero.subtitle}
               </p>
             </Reveal>
 
             <Reveal delay={800}>
-              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
+              <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-stretch sm:items-center">
                 <Link
                   to="/shop"
-                  className="group relative inline-flex items-center justify-center gap-4 bg-primary text-primary-foreground w-full sm:w-auto px-10 py-4 md:py-5 text-[10px] uppercase tracking-[0.3em] font-bold overflow-hidden transition-all hover:shadow-gold"
+                  className="group relative inline-flex items-center justify-between sm:justify-center gap-4 bg-primary text-primary-foreground w-fit mr-auto ms-0 sm:mx-auto sm:w-auto px-8 sm:px-10 py-3 sm:py-5 text-xs sm:text-[10px] uppercase tracking-[0.3em] font-bold overflow-hidden transition-all hover:shadow-gold text-left sm:text-center whitespace-nowrap"
                 >
                   <span className="relative z-10">{t.hero.cta}</span>
-                  <ArrowRight className="h-4 w-4 relative z-10 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
+                  <ArrowRight className="h-5 w-5 sm:h-4 sm:w-4 relative z-10 transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1" />
                   <div className="absolute inset-0 bg-primary-glow translate-y-full transition-transform group-hover:translate-y-0" />
                 </Link>
               </div>
@@ -172,7 +172,7 @@ export default function Home() {
         </div>
 
         {/* Visual Indicator (The indicator to show it swaps) */}
-        <div className="absolute bottom-10 right-10 z-30 flex gap-2">
+        <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 z-30 flex gap-2">
           {heroImages.map((_, i) => (
             <div 
               key={i}
@@ -193,9 +193,9 @@ export default function Home() {
             { icon: ShieldCheck, label: t.trust.secure },
             { icon: CreditCard, label: t.trust.cod, className: "sm:col-span-2 md:col-span-1" },
           ].map((it, i) => (
-            <div key={i} className={cn("flex items-center justify-center gap-5 py-8 md:py-12 text-foreground/90 group hover:bg-primary/5 transition-all duration-500", it.className)}>
-              <it.icon className="h-6 w-6 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
-              <span className="text-[10px] md:text-[12px] uppercase tracking-[0.3em] md:tracking-[0.4em] font-normal">{it.label}</span>
+            <div key={i} className={cn("flex items-center justify-center gap-4 py-6 md:py-12 text-foreground/90 group hover:bg-primary/5 transition-all duration-500", it.className)}>
+              <it.icon className="h-5 w-5 md:h-6 md:w-6 text-primary transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3" />
+              <span className="text-xs sm:text-[9px] md:text-[12px] uppercase tracking-[0.3em] md:tracking-[0.4em] font-normal">{it.label}</span>
             </div>
           ))}
         </div>
@@ -205,10 +205,10 @@ export default function Home() {
       <section className="container-luxury py-16 md:py-32">
         <Reveal>
           <div className="text-center mb-12 md:mb-20 px-4">
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 md:mb-4 font-normal">{t.common.featured}</p>
-            <h2 className="font-display text-3xl md:text-7xl text-cream mb-4 md:mb-6">{t.sections.bestsellers}</h2>
+            <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 md:mb-4 font-normal">{t.common.featured}</p>
+            <h2 className="font-display text-4xl sm:text-3xl md:text-7xl text-cream mb-4 md:mb-6">{t.sections.bestsellers}</h2>
             <Ornament className="mb-6 md:mb-8" />
-            <p className="text-muted-foreground text-sm md:text-base max-w-lg mx-auto leading-relaxed italic">
+            <p className="text-base sm:text-sm md:text-base max-w-lg mx-auto leading-relaxed italic">
               {t.sections.bestsellersSub}
             </p>
           </div>
@@ -228,11 +228,11 @@ export default function Home() {
           <Reveal>
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 md:mb-16 gap-6 md:gap-8 px-4">
               <div className="max-w-xl">
-                <h2 className="font-display text-3xl md:text-7xl text-cream mb-3 md:mb-4">{t.sections.categories}</h2>
+                <h2 className="font-display text-4xl sm:text-3xl md:text-7xl text-cream mb-3 md:mb-4">{t.sections.categories}</h2>
                 <div className="h-0.5 md:h-1 w-12 md:w-20 bg-primary mb-4 md:mb-6" />
-                <p className="text-muted-foreground text-sm md:text-base">{t.sections.categoriesSub}</p>
+                <p className="text-base sm:text-sm md:text-base">{t.sections.categoriesSub}</p>
               </div>
-              <Link to="/shop" className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.3em] text-primary hover:text-primary-glow flex items-center gap-2 group transition-colors">
+              <Link to="/shop" className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.3em] text-primary hover:text-primary-glow flex items-center gap-2 group transition-colors">
                 {t.common.viewAll} <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
@@ -251,7 +251,7 @@ export default function Home() {
                   <div className="absolute inset-0 border border-primary/0 group-hover:border-primary/20 transition-all m-3 md:m-4" />
                   <div className="absolute inset-x-0 bottom-0 p-6 md:p-10 transform translate-y-2 md:translate-y-4 group-hover:translate-y-0 transition-transform">
                     <h3 className="font-display text-2xl md:text-4xl text-cream mb-2 md:mb-3">{localizedField(c, "name", locale)}</h3>
-                    <span className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary opacity-0 group-hover:opacity-100 transition-all duration-500">
+                    <span className="text-xs sm:text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary opacity-0 group-hover:opacity-100 transition-all duration-500">
                       Explore Collection
                     </span>
                   </div>
@@ -266,9 +266,9 @@ export default function Home() {
       <section className="container-luxury py-16 md:py-32">
         <Reveal>
           <div className="flex items-center gap-4 md:gap-8 mb-10 md:mb-16 px-4">
-            <h2 className="font-display text-3xl md:text-6xl text-cream whitespace-nowrap">{t.sections.newArrivals}</h2>
+            <h2 className="font-display text-4xl sm:text-3xl md:text-6xl text-cream whitespace-nowrap">{t.sections.newArrivals}</h2>
             <div className="h-px w-full bg-border/20" />
-            <p className="text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary whitespace-nowrap font-normal">{t.common.new}</p>
+            <p className="text-xs sm:text-[9px] md:text-[10px] uppercase tracking-[0.3em] md:tracking-[0.4em] text-primary whitespace-nowrap font-normal">{t.common.new}</p>
           </div>
         </Reveal>
         <div className="flex gap-4 md:gap-8 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide px-4 md:px-0 lg:grid lg:grid-cols-4">
@@ -295,13 +295,13 @@ export default function Home() {
         <div className="container-luxury relative z-10 w-full py-16 md:py-24">
           <Reveal>
             <div className="max-w-2xl mx-auto text-center px-4">
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary font-normal mb-4 drop-shadow-md">
+              <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary font-normal mb-4 drop-shadow-md">
                 {t.sections.newsletterTag}
               </p>
-              <h2 className="font-display text-3xl md:text-6xl lg:text-7xl text-cream mb-4 tracking-tight leading-tight drop-shadow-lg">
+              <h2 className="font-display text-4xl sm:text-3xl md:text-6xl lg:text-7xl text-cream mb-4 tracking-tight leading-tight drop-shadow-lg">
                 {t.sections.newsletter}
               </h2>
-              <p className="text-foreground/90 mb-10 max-w-md mx-auto leading-relaxed italic text-sm md:text-lg drop-shadow-sm font-light">
+              <p className="text-foreground/90 mb-10 max-w-md mx-auto leading-relaxed italic text-base sm:text-sm md:text-lg drop-shadow-sm font-light">
                 {t.sections.newsletterSub}
               </p>
               
@@ -319,13 +319,13 @@ export default function Home() {
                 <button 
                   type="submit"
                   disabled={submitting}
-                  className="bg-primary text-primary-foreground px-8 py-4 text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20 disabled:opacity-50"
+                  className="bg-primary text-primary-foreground px-8 py-4 text-xs sm:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20 disabled:opacity-50"
                 >
                   {submitting ? '...' : t.footer.subscribe}
                 </button>
               </form>
               
-              <p className="mt-8 text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground/90 font-medium">
+              <p className="mt-8 text-xs sm:text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground/90 font-medium">
                 {t.sections.newsletterFoot}
               </p>
             </div>
@@ -338,8 +338,8 @@ export default function Home() {
         <div className="container-luxury">
           <Reveal>
             <div className="text-center mb-10 md:mb-12">
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary mb-3 font-normal">{t.sections.reviewsTag}</p>
-              <h2 className="font-display text-3xl md:text-5xl text-cream leading-tight">{t.sections.reviews}</h2>
+              <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary mb-3 font-normal">{t.sections.reviewsTag}</p>
+              <h2 className="font-display text-4xl sm:text-3xl md:text-5xl text-cream leading-tight">{t.sections.reviews}</h2>
               <Ornament className="mt-4" />
             </div>
           </Reveal>
@@ -355,7 +355,7 @@ export default function Home() {
                           <Star key={i} className="h-3.5 w-3.5 fill-primary text-primary" />
                         ))}
                       </div>
-                      <blockquote className="font-display text-lg md:text-2xl text-cream/90 leading-relaxed italic mb-6 px-4">
+                      <blockquote className="font-display text-xl sm:text-lg md:text-2xl text-cream/90 leading-relaxed italic mb-6 px-4">
                         "{localizedField(review, "text", locale)}"
                       </blockquote>
                       <cite className="not-italic">

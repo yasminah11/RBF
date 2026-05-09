@@ -114,9 +114,9 @@ export default function Checkout() {
   if (items.length === 0) {
     return (
       <div className="container-luxury py-32 text-center">
-        <h2 className="font-display text-3xl text-cream mb-6">{t.product.selectionNotFound}</h2>
-        <p className="text-muted-foreground mb-10">{t.cart.empty}</p>
-        <Link to="/shop" className="bg-primary text-primary-foreground px-8 py-3 text-[10px] uppercase tracking-widest font-bold">
+        <h2 className="font-display text-4xl sm:text-3xl text-cream mb-6">{t.product.selectionNotFound}</h2>
+        <p className="text-xl sm:text-muted-foreground mb-10">{t.cart.empty}</p>
+        <Link to="/shop" className="bg-primary text-primary-foreground px-8 py-3 text-sm sm:text-[10px] uppercase tracking-widest font-bold">
           {t.product.backToCollections}
         </Link>
       </div>
@@ -127,8 +127,8 @@ export default function Checkout() {
     <div className="pb-20">
       <div className="container-luxury py-10 md:py-16">
         <div className="text-center mb-12">
-          <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 font-bold">{t.checkout.tag}</p>
-          <h1 className="font-display text-4xl md:text-6xl text-cream">{t.checkout.title}</h1>
+          <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 font-bold">{t.checkout.tag}</p>
+          <h1 className="font-display text-5xl sm:text-4xl md:text-6xl text-cream">{t.checkout.title}</h1>
           <Ornament className="mt-4" />
         </div>
 
@@ -139,49 +139,49 @@ export default function Checkout() {
             <section className="bg-card/40 backdrop-blur-sm border border-border/10 p-6 md:p-8 space-y-8">
               <div className="flex items-center gap-3 border-b border-border/10 pb-4">
                 <User className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-2xl text-cream">{t.checkout.clientInfo}</h2>
+                <h2 className="font-display text-3xl sm:text-2xl text-cream">{t.checkout.clientInfo}</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.fullName}</label>
+                  <label className="text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.fullName}</label>
                   <input 
                     type="text" name="name" value={formData.name} onChange={handleInputChange} placeholder="Jane Doe"
-                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all text-cream"
+                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-primary transition-all text-cream"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.email}</label>
+                  <label className="text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.email}</label>
                   <input 
                     type="email" name="email" value={formData.email} onChange={handleInputChange} placeholder="jane@example.com"
-                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all text-cream"
+                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-primary transition-all text-cream"
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.phone}</label>
+                  <label className="text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.phone}</label>
                   <input 
                     type="tel" name="phone" value={formData.phone} onChange={handleInputChange} placeholder="+90 555 123 45 67"
-                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all text-cream"
+                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-primary transition-all text-cream"
                   />
                 </div>
 
                 <div className="space-y-2 md:col-span-2 border-t border-border/10 pt-6 mt-2">
                   <div className="flex items-center gap-2 mb-6">
                     <MapPin className="h-4 w-4 text-primary" />
-                    <h3 className="text-xs uppercase tracking-[0.2em] text-cream font-bold">{t.checkout.deliveryTurkeyOnly}</h3>
+                    <h3 className="text-sm sm:text-xs uppercase tracking-[0.2em] text-cream font-bold">{t.checkout.deliveryTurkeyOnly}</h3>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {/* City Selector */}
                     <div className="space-y-2 relative">
-                      <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.city}</label>
+                      <label className="text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.city}</label>
                       <div className="relative">
                         <input 
                           type="text" value={citySearch}
                           onChange={(e) => { setCitySearch(e.target.value); setShowCityDropdown(true); }}
                           onFocus={() => setShowCityDropdown(true)}
                           placeholder={loadingProvinces ? "..." : "Select"}
-                          className="w-full bg-background/40 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all text-cream"
+                          className="w-full bg-background/40 border border-border/20 px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-primary transition-all text-cream"
                         />
                       </div>
                       <AnimatePresence>
@@ -200,7 +200,7 @@ export default function Checkout() {
 
                     {/* District Selector */}
                     <div className="space-y-2 relative">
-                      <label className={cn("text-[10px] uppercase tracking-widest text-muted-foreground transition-opacity", !formData.city && "opacity-30")}>{t.checkout.district}</label>
+                      <label className={cn("text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground transition-opacity", !formData.city && "opacity-30")}>{t.checkout.district}</label>
                       <div className="relative">
                         <input 
                           type="text" value={districtSearch}
@@ -208,7 +208,7 @@ export default function Checkout() {
                           onFocus={() => setShowDistrictDropdown(true)}
                           disabled={!formData.city}
                           placeholder={loadingDistricts ? "..." : formData.city ? "Select District" : "Select city first"}
-                          className="w-full bg-background/40 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all text-cream disabled:opacity-30"
+                          className="w-full bg-background/40 border border-border/20 px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-primary transition-all text-cream disabled:opacity-30"
                         />
                       </div>
                       <AnimatePresence>
@@ -228,11 +228,11 @@ export default function Checkout() {
                 </div>
 
                 <div className="space-y-2 md:col-span-2">
-                  <label className="text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.address}</label>
+                  <label className="text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground">{t.checkout.address}</label>
                   <textarea 
                     name="address" value={formData.address} onChange={handleInputChange} rows={3}
                     placeholder="Mahalle, Sokak, No, Kat/Daire..."
-                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-sm focus:outline-none focus:border-primary transition-all text-cream resize-none"
+                    className="w-full bg-background/40 border border-border/20 px-4 py-3 text-base sm:text-sm focus:outline-none focus:border-primary transition-all text-cream resize-none"
                   />
                 </div>
               </div>
@@ -251,7 +251,7 @@ export default function Checkout() {
             <div className="bg-card/60 backdrop-blur-md border border-border/20 p-6 md:p-8 sticky top-28 shadow-2xl">
               <div className="flex items-center gap-3 border-b border-border/10 pb-4 mb-6">
                 <ShoppingBag className="h-5 w-5 text-primary" />
-                <h2 className="font-display text-2xl text-cream">{t.checkout.orderSummary}</h2>
+                <h2 className="font-display text-3xl sm:text-2xl text-cream">{t.checkout.orderSummary}</h2>
               </div>
 
               <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-hide mb-8">
@@ -270,7 +270,7 @@ export default function Checkout() {
                       </div>
                       <div className="flex-1 flex flex-col justify-center">
                         <div className="flex justify-between items-start gap-2">
-                          <h4 className="font-display text-sm text-cream mb-0.5 leading-tight">{i.name}</h4>
+                          <h4 className="font-display text-base sm:text-sm text-cream mb-0.5 leading-tight">{i.name}</h4>
                           <button 
                             onClick={() => cart.remove(i.variantId)}
                             className="text-muted-foreground hover:text-destructive transition-colors p-1 -mt-1 -mr-1"
@@ -279,10 +279,10 @@ export default function Checkout() {
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                        <p className="text-[9px] uppercase tracking-widest text-primary font-medium">{i.variantLabel}</p>
+                        <p className="text-xs sm:text-[9px] uppercase tracking-widest text-primary font-medium">{i.variantLabel}</p>
                         <div className="flex justify-between items-center mt-1.5">
-                          <span className="text-[10px] text-muted-foreground">{i.quantity} x {formatPrice(i.price)}</span>
-                          <span className="text-xs text-cream">{formatPrice(i.price * i.quantity)}</span>
+                          <span className="text-sm sm:text-[10px] text-muted-foreground">{i.quantity} x {formatPrice(i.price)}</span>
+                          <span className="text-base sm:text-xs text-cream">{formatPrice(i.price * i.quantity)}</span>
                         </div>
                       </div>
                     </motion.div>
@@ -291,29 +291,29 @@ export default function Checkout() {
               </div>
 
               <div className="space-y-4 pt-6 border-t border-border/10 mb-8">
-                <div className="flex justify-between text-[11px] uppercase tracking-widest">
+                <div className="flex justify-between text-sm sm:text-[11px] uppercase tracking-widest">
                   <span className="text-muted-foreground">{t.cart.subtotal}</span>
                   <span className="text-cream">{formatPrice(subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-[11px] uppercase tracking-widest">
+                <div className="flex justify-between text-sm sm:text-[11px] uppercase tracking-widest">
                   <span className="text-muted-foreground">{t.checkout.shipping}</span>
                   <div className="text-end">
                     <span className="text-primary font-bold block">{locale === "ar" ? "مجاني" : locale === "tr" ? "Ücretsiz" : "Complimentary"}</span>
-                    {formData.city && <span className="text-[8px] text-muted-foreground block mt-1">To {formData.city}, TR</span>}
+                    {formData.city && <span className="text-xs sm:text-[8px] text-muted-foreground block mt-1">To {formData.city}, TR</span>}
                   </div>
                 </div>
               </div>
 
               <div className="border-t border-border/20 pt-6 flex justify-between items-end mb-10">
                 <div className="flex flex-col">
-                  <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-1">{t.checkout.grandTotal}</span>
-                  <span className="text-primary text-3xl font-light">{formatPrice(total)}</span>
+                  <span className="text-xs sm:text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-1">{t.checkout.grandTotal}</span>
+                  <span className="text-primary text-4xl sm:text-3xl font-light">{formatPrice(total)}</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-border/10">
-                <div className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-primary/60" /><span className="text-[8px] uppercase tracking-widest text-muted-foreground">{t.checkout.secureSsl}</span></div>
-                <div className="flex items-center gap-2"><Truck className="h-3.5 w-3.5 text-primary/60" /><span className="text-[8px] uppercase tracking-widest text-muted-foreground">{t.checkout.turkeyDelivery}</span></div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 pt-6 border-t border-border/10">
+                <div className="flex items-center gap-2"><ShieldCheck className="h-3.5 w-3.5 text-primary/60" /><span className="text-xs sm:text-[8px] uppercase tracking-widest text-muted-foreground">{t.checkout.secureSsl}</span></div>
+                <div className="flex items-center gap-2"><Truck className="h-3.5 w-3.5 text-primary/60" /><span className="text-xs sm:text-[8px] uppercase tracking-widest text-muted-foreground">{t.checkout.turkeyDelivery}</span></div>
               </div>
             </div>
           </div>

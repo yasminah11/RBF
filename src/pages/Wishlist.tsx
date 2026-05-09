@@ -13,8 +13,8 @@ export default function Wishlist() {
   return (
     <div className="container-luxury py-10 md:py-20 min-h-[70vh]">
       <div className="text-center mb-16">
-        <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 font-semibold">{t.wishlist.tag}</p>
-        <h1 className="font-display text-4xl md:text-6xl text-cream">{t.wishlist.title}</h1>
+        <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3 font-semibold">{t.wishlist.tag}</p>
+        <h1 className="font-display text-5xl sm:text-4xl md:text-6xl text-cream">{t.wishlist.title}</h1>
         <Ornament className="mt-4" />
       </div>
 
@@ -22,18 +22,18 @@ export default function Wishlist() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl mx-auto text-center py-20 bg-card/30 border border-dashed border-border/10 rounded-sm"
+          className="max-w-2xl mx-auto text-center py-20 bg-card/30 border border-dashed border-border/10 rounded-sm px-4 flex flex-col items-center"
         >
           <div className="bg-primary/5 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart className="text-primary/40 w-8 h-8" />
           </div>
-          <p className="text-muted-foreground italic mb-10 text-lg">{t.wishlist.empty}</p>
-          <Link to="/shop" className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-10 py-4 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-primary-glow transition-all hover:shadow-gold">
+          <p className="text-muted-foreground italic mb-10 text-xl sm:text-lg">{t.wishlist.empty}</p>
+          <Link to="/shop" className="inline-flex items-center justify-between sm:justify-center gap-3 bg-primary text-primary-foreground w-fit mx-auto sm:w-auto px-12 sm:px-10 py-4 sm:py-4 text-sm sm:text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-primary-glow transition-all hover:shadow-gold">
             {t.hero.cta} <ArrowRight className="w-4 h-4" />
           </Link>
         </motion.div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10 px-2 md:px-0">
           {items.map((p) => (
             <ProductCard key={p.id} p={p} />
           ))}

@@ -76,22 +76,22 @@ export function ProductCard({ p }: { p: ProductCardData }) {
         {/* Overlay Controls */}
         <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         
-        {/* Quick Action Buttons */}
-        <div className="absolute top-3 right-3 z-10 flex flex-col gap-2">
+        {/* Quick Action Buttons - Visible on mobile, hover on desktop */}
+        <div className="absolute top-2 right-2 md:top-3 md:right-3 z-10 flex flex-col gap-2">
           <button
             onClick={toggleWishlist}
-            className="bg-background/80 backdrop-blur-md p-2.5 rounded-full text-foreground/70 hover:text-primary transition-all duration-300 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 shadow-luxury"
+            className="bg-background/90 backdrop-blur-md p-3 md:p-2.5 rounded-full text-foreground/90 md:text-foreground/70 hover:text-primary transition-all duration-300 md:transform md:translate-x-4 md:opacity-0 group-hover:translate-x-0 group-hover:opacity-100 shadow-luxury"
             aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
           >
-            <Heart className={cn("h-4 w-4 transition-colors", isWishlisted && "fill-primary text-primary")} />
+            <Heart className={cn("h-5 w-5 md:h-4 md:w-4 transition-colors", isWishlisted && "fill-primary text-primary")} />
           </button>
           
           <button
             onClick={handleQuickAdd}
-            className="bg-background/80 backdrop-blur-md p-2.5 rounded-full text-foreground/70 hover:text-primary transition-all duration-300 transform translate-x-4 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 shadow-luxury delay-75"
+            className="bg-background/90 backdrop-blur-md p-3 md:p-2.5 rounded-full text-foreground/90 md:text-foreground/70 hover:text-primary transition-all duration-300 md:transform md:translate-x-4 md:opacity-0 group-hover:translate-x-0 group-hover:opacity-100 shadow-luxury md:delay-75"
             aria-label="Quick add to cart"
           >
-            <ShoppingBag className="h-4 w-4" />
+            <ShoppingBag className="h-5 w-5 md:h-4 md:w-4" />
           </button>
         </div>
 
@@ -113,11 +113,11 @@ export function ProductCard({ p }: { p: ProductCardData }) {
       
       <div className="product-card-info">
         <h3 className="product-card-title">{name}</h3>
-        <div className="flex items-center justify-center gap-2 text-sm mt-auto">
+        <div className="flex items-center justify-center gap-2 text-base sm:text-sm mt-auto">
           {p.is_on_sale && p.sale_price ? (
             <>
               <span className="text-primary font-medium">{formatPrice(p.sale_price)}</span>
-              <span className="text-muted-foreground line-through opacity-40 text-xs">{formatPrice(p.price)}</span>
+              <span className="text-muted-foreground line-through opacity-40 text-sm sm:text-xs">{formatPrice(p.price)}</span>
             </>
           ) : (
             <span className="text-primary font-light">{formatPrice(p.price)}</span>

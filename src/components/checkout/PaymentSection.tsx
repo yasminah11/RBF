@@ -169,16 +169,16 @@ export function PaymentSection({ items, totalAmount, clientInfo, isValid }: Paym
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  className="bg-primary/5 border border-primary/20 p-10 text-center rounded-sm"
+                  className="bg-primary/5 border border-primary/20 p-6 md:p-10 text-center rounded-sm"
                 >
                   <p className="text-primary font-bold text-[11px] uppercase tracking-[0.3em] mb-3">{t.checkout.payAtDoor}</p>
                   <p className="text-muted-foreground text-xs italic mb-0">{t.checkout.payAtDoorNote}</p>
                   <p className="text-[9px] uppercase tracking-widest text-primary/60 mt-4">{t.checkout.codFee}</p>
                   
-                  <div className="mt-10">
+                  <div className="mt-8 md:mt-10 flex justify-center">
                     <button 
                       disabled={!isValid}
-                      className="group relative w-full max-w-xs mx-auto bg-primary text-primary-foreground py-4 text-[10px] uppercase tracking-[0.4em] font-bold overflow-hidden transition-all hover:shadow-gold disabled:opacity-50 disabled:grayscale"
+                      className="group relative w-fit mx-auto sm:w-auto px-12 sm:px-10 bg-primary text-primary-foreground py-4 text-[10px] uppercase tracking-[0.4em] font-bold overflow-hidden transition-all hover:shadow-gold disabled:opacity-50 disabled:grayscale"
                     >
                       <span className="relative z-10">{t.checkout.completeOrder}</span>
                       <div className="absolute inset-0 bg-primary-glow translate-y-full transition-transform group-hover:translate-y-0" />

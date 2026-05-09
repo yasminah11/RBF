@@ -20,7 +20,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md bg-background/95 backdrop-blur-xl border-l border-primary/10 p-0 flex flex-col shadow-luxury">
         <SheetHeader className="px-6 py-6 border-b border-border/10 flex flex-row items-center justify-between">
-          <SheetTitle className="font-display text-2xl text-cream flex items-center gap-3">
+          <SheetTitle className="font-display text-3xl sm:text-2xl text-cream flex items-center gap-3">
             <ShoppingBag className="h-5 w-5 text-primary" />
             {t.cart.title}
           </SheetTitle>
@@ -32,10 +32,10 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
               <div className="bg-primary/5 w-20 h-20 rounded-full flex items-center justify-center">
                 <ShoppingBag className="text-primary/40 w-10 h-10" />
               </div>
-              <p className="text-muted-foreground italic text-lg">{t.cart.empty}</p>
+              <p className="text-muted-foreground italic text-xl sm:text-lg">{t.cart.empty}</p>
               <button 
                 onClick={() => onOpenChange(false)}
-                className="inline-flex items-center gap-3 bg-primary text-primary-foreground px-8 py-3 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-primary-glow transition-all"
+                className="inline-flex items-center justify-between sm:justify-center gap-3 bg-primary text-primary-foreground w-full sm:w-auto px-8 sm:py-3 py-4 text-sm sm:text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-primary-glow transition-all"
               >
                 {t.cart.continue} <ArrowRight className="w-4 h-4" />
               </button>
@@ -59,7 +59,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
                     <div className="flex-1 flex flex-col justify-between py-1">
                       <div>
                         <div className="flex justify-between items-start gap-2">
-                          <h3 className="font-display text-base text-cream leading-tight">{i.name}</h3>
+                          <h3 className="font-display text-lg sm:text-base text-cream leading-tight">{i.name}</h3>
                           <button 
                             onClick={() => cart.remove(i.variantId)} 
                             className="text-muted-foreground hover:text-destructive transition-colors shrink-0"
@@ -68,7 +68,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
                             <X className="h-3.5 w-3.5" />
                           </button>
                         </div>
-                        <p className="text-[10px] uppercase tracking-widest text-primary mt-1">{i.variantLabel}</p>
+                        <p className="text-xs sm:text-[10px] uppercase tracking-widest text-primary mt-1">{i.variantLabel}</p>
                       </div>
 
                       <div className="flex items-center justify-between mt-4">
@@ -86,7 +86,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
                                 initial={{ y: 5, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 exit={{ y: -5, opacity: 0 }}
-                                className="text-[11px] font-medium text-cream"
+                                className="text-sm sm:text-[11px] font-medium text-cream"
                               >
                                 {i.quantity}
                               </motion.span>
@@ -99,7 +99,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
                             +
                           </button>
                         </div>
-                        <span className="text-sm text-primary font-light">{formatPrice(i.price * i.quantity)}</span>
+                        <span className="text-base sm:text-sm text-primary font-light">{formatPrice(i.price * i.quantity)}</span>
                       </div>
                     </div>
                   </motion.div>
@@ -113,12 +113,12 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
           <div className="px-6 py-8 bg-card/40 border-t border-border/10 space-y-6">
             <div className="flex justify-between items-end">
               <div className="flex flex-col">
-                <span className="text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-1">{t.cart.subtotal}</span>
+                <span className="text-xs sm:text-[10px] uppercase tracking-[0.3em] text-muted-foreground mb-1">{t.cart.subtotal}</span>
                 <motion.span 
                   key={total}
                   initial={{ opacity: 0.5 }}
                   animate={{ opacity: 1 }}
-                  className="text-primary text-2xl font-light"
+                  className="text-primary text-3xl sm:text-2xl font-light"
                 >
                   {formatPrice(total)}
                 </motion.span>
@@ -130,7 +130,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
               <Link 
                 to="/checkout"
                 onClick={() => onOpenChange(false)}
-                className="group relative block w-full bg-primary text-primary-foreground py-4 text-[10px] uppercase tracking-[0.4em] font-bold overflow-hidden transition-all hover:shadow-gold text-center"
+                className="group relative block w-full bg-primary text-primary-foreground py-4 text-sm sm:text-[10px] uppercase tracking-[0.4em] font-bold overflow-hidden transition-all hover:shadow-gold text-center"
               >
                 <span className="relative z-10">{t.cart.checkout}</span>
                 <div className="absolute inset-0 bg-primary-glow translate-y-full transition-transform group-hover:translate-y-0" />
@@ -138,7 +138,7 @@ export function CartDrawer({ open, onOpenChange }: { open: boolean; onOpenChange
               <Link 
                 to="/cart" 
                 onClick={() => onOpenChange(false)}
-                className="block w-full text-center py-2 text-[9px] uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
+                className="block w-full text-center py-2 text-xs sm:text-[9px] uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors"
               >
                 {t.cart.viewFull}
               </Link>

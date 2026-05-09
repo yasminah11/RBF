@@ -21,10 +21,10 @@ export default function About() {
   return (
     <div className="container-luxury py-20 max-w-3xl">
       <div className="text-center">
-        <h1 className="font-display text-5xl text-cream">{content.title}</h1>
+        <h1 className="font-display text-6xl sm:text-5xl text-cream">{content.title}</h1>
         <Ornament />
       </div>
-      <p className="text-lg text-foreground/80 leading-loose text-center">{content.body}</p>
+      <p className="text-xl sm:text-lg text-foreground/80 leading-loose text-center">{content.body}</p>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { useI18n, localizedField } from "@/i18n/I18nContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { Ornament } from "@/components/Ornament";
 import { productImg } from "@/lib/assets";
-import { Heart, ShoppingBag, Truck, ShieldCheck, ChevronRight, Maximize2, Minus, Plus, Share2 } from "lucide-react";
+import { Heart, ShoppingBag, Truck, ShieldCheck, ChevronRight, Maximize2, Minus, Plus, ArrowRight } from "lucide-react";
 import { useWishlist, wishlist } from "@/store/wishlist";
 import { cart } from "@/store/cart";
 import { cn } from "@/lib/utils";
@@ -90,9 +90,9 @@ export default function ProductDetail() {
 
   if (!p) return (
     <div className="container-luxury py-32 text-center">
-      <h2 className="font-display text-4xl text-cream mb-6">{t.product.selectionNotFound}</h2>
-      <p className="text-muted-foreground mb-10">{t.product.selectionNotFoundText}</p>
-      <Link to="/shop" className="bg-primary text-primary-foreground px-10 py-4 text-[10px] uppercase tracking-widest font-bold hover:bg-primary-glow transition-all">
+      <h2 className="font-display text-5xl sm:text-4xl text-cream mb-6">{t.product.selectionNotFound}</h2>
+      <p className="text-base sm:text-muted-foreground mb-10">{t.product.selectionNotFoundText}</p>
+      <Link to="/shop" className="bg-primary text-primary-foreground px-10 py-4 text-sm sm:text-[10px] uppercase tracking-widest font-bold hover:bg-primary-glow transition-all">
         {t.product.backToCollections}
       </Link>
     </div>
@@ -103,10 +103,10 @@ export default function ProductDetail() {
   const sizes = ["36", "38", "40", "42", "44"]; // Mock sizes
 
   return (
-    <div className="pb-20">
-      <div className="container-luxury py-6 md:py-10">
+    <div className="pb-20 overflow-x-hidden">
+      <div className="container-luxury py-6 md:py-10 w-full max-w-full">
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-[9px] uppercase tracking-widest text-muted-foreground mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide pb-2">
+        <nav className="flex items-center gap-2 text-xs sm:text-[9px] uppercase tracking-widest text-muted-foreground mb-8 overflow-x-auto whitespace-nowrap scrollbar-hide pb-2 px-4 md:px-0">
           <Link to="/" className="hover:text-primary transition-colors">Home</Link>
           <ChevronRight className="h-3 w-3 shrink-0" />
           <Link to="/shop" className="hover:text-primary transition-colors">{t.nav.shop}</Link>
@@ -114,17 +114,17 @@ export default function ProductDetail() {
           <span className="text-primary font-medium truncate">{name}</span>
         </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
+        <div className="flex flex-col md:flex-row gap-10 lg:gap-16">
           {/* Image Gallery */}
-          <div className="lg:col-span-7">
+          <div className="w-full md:w-7/12 max-w-full">
             <div 
               ref={zoomRef}
               onMouseEnter={() => setZoom(true)}
               onMouseLeave={() => setZoom(false)}
               onMouseMove={handleMouseMove}
               className={cn(
-                "relative aspect-[3/4] overflow-hidden bg-secondary group cursor-zoom-in border border-border/5",
-                zoom && "cursor-zoom-out"
+                "relative aspect-[3/4] w-full overflow-hidden bg-secondary group md:cursor-zoom-in border border-border/5",
+                zoom && "md:cursor-zoom-out"
               )}
               style={{
                 '--x': '50%',
@@ -136,43 +136,43 @@ export default function ProductDetail() {
                 alt={name}
                 className={cn(
                   "w-full h-full object-cover transition-transform duration-500",
-                  zoom ? "scale-[2.5] origin-[var(--x)_var(--y)]" : "scale-100"
+                  zoom ? "md:scale-[2.5] md:origin-[var(--x)_var(--y)]" : "scale-100"
                 )}
               />
               {!zoom && (
-                <div className="absolute bottom-6 left-6 flex items-center gap-2 bg-background/40 backdrop-blur-md px-3 py-1.5 text-[9px] uppercase tracking-widest text-cream opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="hidden md:flex absolute bottom-6 left-6 items-center gap-2 bg-background/40 backdrop-blur-md px-3 py-1.5 text-xs sm:text-[9px] uppercase tracking-widest text-cream opacity-0 group-hover:opacity-100 transition-opacity">
                   <Maximize2 className="h-3 w-3" /> {t.product.zoom}
                 </div>
               )}
               
               <button 
                 onClick={(e) => { e.preventDefault(); wishlist.toggle(p); }}
-                className="absolute top-6 right-6 p-3 rounded-full bg-background/60 backdrop-blur-md text-foreground/80 hover:text-primary transition-all border border-border/10 shadow-luxury z-10"
+                className="absolute top-4 right-4 md:top-6 md:right-6 p-3.5 md:p-3 rounded-full bg-background/60 backdrop-blur-md text-foreground/90 md:text-foreground/80 hover:text-primary transition-all border border-border/10 shadow-luxury z-10"
               >
-                <Heart className={cn("h-5 w-5 transition-colors", isWishlisted && "fill-primary text-primary")} />
+                <Heart className={cn("h-6 w-6 md:h-5 md:w-5 transition-colors", isWishlisted && "fill-primary text-primary")} />
               </button>
             </div>
           </div>
 
           {/* Details */}
-          <div className="lg:col-span-5 space-y-8 lg:sticky lg:top-[140px] lg:self-start">
+          <div className="w-full md:w-5/12 space-y-8 md:sticky md:top-[140px] md:self-start px-4 md:px-0 max-w-full">
             <div className="space-y-4">
               <div className="flex items-center gap-4">
                  {p.is_new_arrival && (
-                   <span className="text-[9px] uppercase tracking-[0.2em] font-bold text-primary px-3 py-1 bg-primary/10 border border-primary/20">{t.common.new}</span>
+                   <span className="text-xs sm:text-[9px] uppercase tracking-[0.2em] font-bold text-primary px-3 py-1 bg-primary/10 border border-primary/20">{t.common.new}</span>
                  )}
-                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground">SKU: {p.sku}</span>
+                 <span className="text-xs sm:text-[10px] uppercase tracking-widest text-muted-foreground">SKU: {p.sku}</span>
               </div>
-              <h1 className="font-display text-4xl md:text-5xl lg:text-6xl text-cream leading-[1.1]">{name}</h1>
+              <h1 className="font-display text-5xl sm:text-4xl md:text-5xl lg:text-6xl text-cream leading-[1.1]">{name}</h1>
               
               <div className="flex items-center gap-4 pt-2">
                 {p.is_on_sale && p.sale_price ? (
                   <>
-                    <span className="text-3xl md:text-4xl text-primary font-light">{formatPrice(p.sale_price)}</span>
-                    <span className="text-xl text-muted-foreground line-through opacity-50">{formatPrice(p.price)}</span>
+                    <span className="text-4xl sm:text-3xl md:text-4xl text-primary font-light">{formatPrice(p.sale_price)}</span>
+                    <span className="text-2xl sm:text-xl text-muted-foreground line-through opacity-50">{formatPrice(p.price)}</span>
                   </>
                 ) : (
-                  <span className="text-3xl md:text-4xl text-primary font-light">{formatPrice(p.price)}</span>
+                  <span className="text-4xl sm:text-3xl md:text-4xl text-primary font-light">{formatPrice(p.price)}</span>
                 )}
               </div>
             </div>
@@ -182,8 +182,8 @@ export default function ProductDetail() {
             {/* Sizes */}
             <div className="space-y-5">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-cream/90">{t.product.size}</span>
-                <button className="text-[9px] uppercase tracking-[0.2em] text-primary hover:text-primary-glow underline underline-offset-4 transition-colors font-medium">
+                <span className="text-xs sm:text-[10px] uppercase tracking-[0.3em] font-bold text-cream/90">{t.product.size}</span>
+                <button className="text-xs sm:text-[9px] uppercase tracking-[0.2em] text-primary hover:text-primary-glow underline underline-offset-4 transition-colors font-medium">
                   {t.product.sizeGuide}
                 </button>
               </div>
@@ -193,7 +193,7 @@ export default function ProductDetail() {
                     key={s}
                     onClick={() => setSelectedSize(s)}
                     className={cn(
-                      "w-12 h-12 md:w-14 md:h-14 flex items-center justify-center border text-[11px] md:text-xs tracking-[0.1em] transition-all duration-300 font-medium",
+                      "w-12 h-12 md:w-14 md:h-14 flex items-center justify-center border text-sm sm:text-[11px] md:text-xs tracking-[0.1em] transition-all duration-300 font-medium",
                       selectedSize === s 
                         ? "border-primary bg-primary text-primary-foreground shadow-gold" 
                         : "border-border/20 text-foreground/60 hover:border-primary/40 hover:text-cream"
@@ -205,34 +205,37 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Actions: Quantity & Add to Cart - Fixed for Phone Screens */}
-            <div className="flex items-center gap-3 pt-4 w-full">
-              {/* Piece Counter - Smaller and fixed width on mobile */}
-              <div className="flex items-center border border-border/20 h-14 bg-card/20 w-32 sm:w-[140px] shrink-0">
+            {/* Actions: Quantity & Add to Cart */}
+            <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full">
+              {/* Piece Counter - Full width on mobile */}
+              <div className="flex items-center border border-border/20 h-14 bg-card/20 w-full sm:w-[140px] shrink-0">
                 <button 
                   onClick={() => setQty(Math.max(1, qty - 1))} 
-                  className="flex-1 h-full flex items-center justify-center hover:text-primary transition-colors"
+                  className="flex-1 h-full flex items-center justify-center hover:text-primary transition-colors p-2"
                   aria-label="Decrease quantity"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-5 w-5 md:h-4 md:w-4" />
                 </button>
-                <span className="w-8 text-center text-xs font-bold text-cream tracking-tighter">{qty}</span>
+                <span className="w-12 text-center text-sm md:text-xs font-bold text-cream tracking-tighter">{qty}</span>
                 <button 
                   onClick={() => setQty(qty + 1)} 
-                  className="flex-1 h-full flex items-center justify-center hover:text-primary transition-colors"
+                  className="flex-1 h-full flex items-center justify-center hover:text-primary transition-colors p-2"
                   aria-label="Increase quantity"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-5 w-5 md:h-4 md:w-4" />
                 </button>
               </div>
               
-              {/* Add to Cart Button - Full width flexibility */}
+              {/* Add to Cart Button - Centered fixed width on mobile */}
               <button 
                 onClick={handleAdd}
-                className="flex-1 group relative h-14 bg-primary text-primary-foreground px-4 text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.4em] font-bold overflow-hidden transition-all hover:shadow-gold flex items-center justify-center gap-2 md:gap-3"
+                className="group relative inline-flex items-center justify-center gap-4 bg-primary text-primary-foreground w-fit mx-auto sm:w-auto px-12 sm:px-10 py-3 sm:py-5 text-sm sm:text-[10px] uppercase tracking-[0.3em] font-bold overflow-hidden transition-all hover:shadow-gold flex-1"
               >
-                <ShoppingBag className="h-4 w-4 relative z-10 shrink-0" />
-                <span className="relative z-10 truncate">{t.product.addToCart}</span>
+                <div className="flex items-center gap-3 relative z-10">
+                  <ShoppingBag className="h-5 w-5 sm:h-4 sm:w-4 shrink-0" />
+                  <span className="truncate">{t.product.addToCart}</span>
+                </div>
+                <ArrowRight className="h-5 w-5 sm:hidden relative z-10" />
                 <div className="absolute inset-0 bg-primary-glow translate-y-full transition-transform group-hover:translate-y-0 duration-500" />
               </button>
             </div>
@@ -245,8 +248,8 @@ export default function ProductDetail() {
                   <Truck className="h-4 w-4 text-primary" />
                 </div>
                 <div className="space-y-1.5">
-                  <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-bold text-cream">{t.product.shipping}</h4>
-                  <p className="text-[10px] md:text-[11px] leading-relaxed text-muted-foreground/80 font-medium">
+                  <h4 className="text-xs sm:text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-bold text-cream">{t.product.shipping}</h4>
+                  <p className="text-xs sm:text-[10px] md:text-[11px] leading-relaxed text-muted-foreground/80 font-medium">
                     {t.product.shippingText}
                   </p>
                 </div>
@@ -258,8 +261,8 @@ export default function ProductDetail() {
                   <ShieldCheck className="h-4 w-4 text-primary" />
                 </div>
                 <div className="space-y-1.5">
-                  <h4 className="text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-bold text-cream">Authenticity</h4>
-                  <p className="text-[10px] md:text-[11px] leading-relaxed text-muted-foreground/80 font-medium">
+                  <h4 className="text-xs sm:text-[10px] md:text-[11px] uppercase tracking-[0.3em] font-bold text-cream">Authenticity</h4>
+                  <p className="text-xs sm:text-[10px] md:text-[11px] leading-relaxed text-muted-foreground/80 font-medium">
                     Certified 100% authentic designer evening wear from Royal Brands.
                   </p>
                 </div>
@@ -268,7 +271,7 @@ export default function ProductDetail() {
 
             {/* Description Text */}
             <div className="pt-8">
-              <p className="text-sm md:text-base text-muted-foreground leading-relaxed font-light italic">
+              <p className="text-base sm:text-sm md:text-base text-muted-foreground leading-relaxed font-light italic">
                 {desc}
               </p>
             </div>
@@ -277,13 +280,13 @@ export default function ProductDetail() {
 
         {/* Related Products */}
         {related.length > 0 && (
-          <section className="mt-32">
-            <div className="flex items-center gap-6 mb-16 px-4 md:px-0">
-               <h2 className="font-display text-3xl md:text-5xl text-cream whitespace-nowrap">{t.product.related}</h2>
+          <section className="mt-24 md:mt-32">
+            <div className="flex items-center gap-4 md:gap-6 mb-12 md:mb-16 px-4 md:px-0">
+               <h2 className="font-display text-4xl sm:text-3xl md:text-5xl text-cream whitespace-nowrap">{t.product.related}</h2>
                <div className="h-px w-full bg-border/10" />
-               <span className="text-[9px] uppercase tracking-[0.4em] text-primary whitespace-nowrap font-bold">{t.product.relatedTag}</span>
+               <span className="text-xs sm:text-[9px] uppercase tracking-[0.4em] text-primary whitespace-nowrap font-bold">{t.product.relatedTag}</span>
             </div>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-10">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10 px-2 md:px-0">
               {related.map((p) => <ProductCard key={p.id} p={p} />)}
             </div>
           </section>

@@ -86,20 +86,20 @@ export default function Shop() {
   return (
     <div className="container-luxury py-10 md:py-16">
       <div className="text-center mb-10 px-4">
-        <p className="text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3">{t.nav.shop}</p>
-        <h1 className="font-display text-3xl md:text-6xl text-cream leading-tight">{categoryName}</h1>
+        <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3">{t.nav.shop}</p>
+        <h1 className="font-display text-4xl sm:text-3xl md:text-6xl text-cream leading-tight">{categoryName}</h1>
         <Ornament className="mt-4" />
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 md:mb-12 border-b border-border/10 pb-6 px-4">
-        <p className="text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground order-2 sm:order-1">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 md:mb-12 border-b border-border/10 pb-6 px-4 md:px-0">
+        <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-widest text-muted-foreground order-2 sm:order-1">
           {products.length} {locale === "ar" ? "منتج" : locale === "tr" ? "Ürün" : "Products"}
         </p>
         <div className="w-full sm:w-auto order-1 sm:order-2">
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as any)}
-            className="w-full sm:w-[200px] bg-card border border-border/20 text-[11px] md:text-xs uppercase tracking-widest px-4 py-2.5 focus:outline-none focus:border-primary transition-colors appearance-none text-cream"
+            className="w-full sm:w-[200px] bg-card border border-border/20 text-sm sm:text-[11px] md:text-xs uppercase tracking-widest px-4 py-3 md:py-2.5 focus:outline-none focus:border-primary transition-colors appearance-none text-cream"
           >
             <option value="newest">{locale === "ar" ? "الأحدث" : locale === "tr" ? "En Yeni" : "Newest"}</option>
             <option value="price_asc">{locale === "ar" ? "السعر: من الأقل" : locale === "tr" ? "Fiyat: Artan" : "Price: Low to High"}</option>
@@ -109,20 +109,20 @@ export default function Shop() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 px-2 md:px-0">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 px-0">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="aspect-[4/5] bg-card/50 animate-pulse rounded-sm" />
           ))}
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 px-2 md:px-0">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 px-0">
             {products.map((p) => <ProductCard key={p.id} p={p} />)}
           </div>
 
           {products.length === 0 && (
             <div className="text-center py-24">
-              <p className="text-muted-foreground italic">
+              <p className="text-base text-muted-foreground italic">
                 {locale === "ar" ? "لم يتم العثور على منتجات." : locale === "tr" ? "Ürün bulunamadı." : "No products found."}
               </p>
             </div>

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Globe, Heart, Search, ShoppingBag, User, Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 import { useI18n } from "@/i18n/I18nContext";
 import { useState, useEffect, useRef } from "react";
@@ -13,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 export function Header() {
   const { t, locale, setLocale } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isHomePage = location.pathname === "/";
+  
   const [openLang, setOpenLang] = useState(false);
   const [openMobile, setOpenMobile] = useState(false);
   const [openDressesMobile, setOpenDressesMobile] = useState(false);
@@ -21,6 +24,8 @@ export function Header() {
   const searchInputRef = useRef<HTMLInputElement>(null);
   const openCart = useCartDrawer();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const items = useCart();
   const wishlistItems = useWishlist();
@@ -43,11 +48,30 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      const currentScrollY = window.scrollY;
+      setIsScrolled(currentScrollY > 10);
+      
+      // Hide on scroll down, show on scroll up (mobile only)
+      if (window.innerWidth < 1024) {
+        if (currentScrollY > lastScrollY && currentScrollY > 80) {
+          setIsVisible(false);
+        } else {
+          setIsVisible(true);
+        }
+      } else {
+        setIsVisible(true);
+      }
+      setLastScrollY(currentScrollY);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [lastScrollY]);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setOpenMobile(false);
+    setOpenDressesMobile(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (openMobile || openCart || showSearch) {
@@ -98,20 +122,21 @@ export function Header() {
       <header 
         className={cn(
           "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-luxury",
-          isScrolled 
-            ? "bg-background/90 backdrop-blur-xl shadow-gold border-b border-primary/10 py-2 md:py-3" 
-            : "bg-gradient-to-b from-background/80 to-transparent py-3 md:py-6"
+          !isVisible && "-translate-y-full",
+          (isScrolled || !isHomePage) 
+            ? "bg-background/95 backdrop-blur-xl shadow-gold border-b border-primary/10 py-2 md:py-3" 
+            : "bg-gradient-to-b from-background/80 to-transparent py-2 md:py-6"
         )}
       >
-        <div className="container-luxury flex items-center justify-between px-3 sm:px-6 md:px-10 gap-1 sm:gap-4 md:gap-8">
+        <div className="container-luxury flex items-center justify-between px-4 sm:px-6 md:px-10 gap-1 sm:gap-4 md:gap-8">
           {/* Left: Mobile Toggle & Lang Switcher */}
           <div className="flex items-center gap-1 sm:gap-4 flex-1">
             <button 
               onClick={() => setOpenMobile(true)} 
-              className="lg:hidden text-foreground/90 hover:text-primary transition-colors p-1.5 sm:p-2 -ms-1 sm:-ms-2" 
+              className="lg:hidden text-foreground/90 hover:text-primary transition-colors p-3 -ms-3" 
               aria-label="Open Menu"
             >
-              <Menu className="h-5 w-5 sm:h-6 sm:w-6" />
+              <Menu className="h-6 w-6" />
             </button>
             
             <div className="flex items-center gap-2 sm:gap-6">
@@ -128,7 +153,7 @@ export function Header() {
               <div className="relative">
                 <button 
                   onClick={() => setOpenLang(!openLang)} 
-                  className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-[10px] sm:text-[11px] uppercase tracking-widest font-semibold p-1.5" 
+                  className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-[10px] sm:text-[11px] uppercase tracking-widest font-semibold p-3" 
                   aria-label={t.common.selectLanguage}
                 >
                   <Globe className="h-4.5 w-4.5 sm:h-4 sm:w-4" />
@@ -141,7 +166,7 @@ export function Header() {
                         key={l}
                         onClick={() => { setLocale(l); setOpenLang(false); }}
                         className={cn(
-                          "block w-full text-start px-5 py-2.5 text-[10px] uppercase tracking-widest transition-all duration-300 hover:bg-primary/10 hover:ps-6",
+                          "block w-full text-start px-5 py-3 text-[10px] uppercase tracking-widest transition-all duration-300 hover:bg-primary/10 hover:ps-6",
                           l === locale ? "text-primary font-bold" : "text-foreground/80"
                         )}
                       >
@@ -157,25 +182,25 @@ export function Header() {
           {/* Center: Logo */}
           <Link to="/" className={cn(
             "flex flex-col items-center transition-all duration-500 ease-luxury group text-center px-1 shrink-0",
-            isScrolled ? "scale-95" : "scale-100"
+            (isScrolled || !isHomePage) ? "scale-90 md:scale-95" : "scale-100"
           )}>
             <div className="flex items-center gap-1.5 sm:gap-3">
               <div className={cn(
                 "border border-primary flex items-center justify-center relative overflow-hidden group-hover:bg-primary transition-all duration-500 shrink-0",
-                isScrolled ? "w-6 h-6 sm:w-8 sm:h-8" : "w-7 h-7 sm:w-10 sm:h-10"
+                (isScrolled || !isHomePage) ? "w-6 h-6 sm:w-8 sm:h-8" : "w-7 h-7 sm:w-10 sm:h-10"
               )}>
                 <span className={cn(
                   "font-display text-primary group-hover:text-primary-foreground transition-colors duration-500 z-10 font-bold",
-                  isScrolled ? "text-[8px] sm:text-[10px]" : "text-[9px] sm:text-base"
+                  (isScrolled || !isHomePage) ? "text-[8px] sm:text-[10px]" : "text-[9px] sm:text-base"
                 )}>RBF</span>
                 <div className="absolute inset-0 bg-primary translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
               </div>
               <div className="flex flex-col items-start justify-center">
                 <span className={cn(
                   "font-display tracking-[0.05em] sm:tracking-[0.2em] text-cream transition-all duration-500 block leading-tight whitespace-nowrap font-bold md:font-semibold",
-                  isScrolled 
-                    ? "text-[12px] sm:text-base md:text-xl" 
-                    : "text-[14px] sm:text-xl md:text-3xl"
+                  (isScrolled || !isHomePage) 
+                    ? "text-[11px] sm:text-base md:text-xl" 
+                    : "text-[13px] sm:text-xl md:text-3xl"
                 )}>
                   ROYAL <span className="text-primary">BRANDS</span> FASHION
                 </span>
@@ -192,10 +217,10 @@ export function Header() {
               </Link>
               
               {/* Wishlist - Visible on all screens direct in navbar */}
-              <Link to="/wishlist" className="relative p-1.5 sm:p-2 text-foreground/80 hover:text-primary transition-all duration-300" aria-label={t.wishlist.title}>
-                <Heart className={cn("h-4.5 w-4.5 sm:h-5 sm:w-5 md:h-4 md:w-4", wishlistCount > 0 && "fill-primary text-primary")} />
+              <Link to="/wishlist" className="relative p-3 text-foreground/80 hover:text-primary transition-all duration-300" aria-label={t.wishlist.title}>
+                <Heart className={cn("h-5 w-5 md:h-4 md:w-4", wishlistCount > 0 && "fill-primary text-primary")} />
                 {wishlistCount > 0 && (
-                  <span className="absolute top-1 right-1 sm:-top-1.5 sm:-end-1 bg-primary text-primary-foreground text-[7px] sm:text-[9px] font-bold rounded-full h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center animate-in zoom-in">
+                  <span className="absolute top-1.5 right-1.5 sm:-top-1.5 sm:-end-1 bg-primary text-primary-foreground text-[7px] sm:text-[9px] font-bold rounded-full h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center animate-in zoom-in">
                     {wishlistCount}
                   </span>
                 )}
@@ -204,12 +229,12 @@ export function Header() {
               {/* Cart - Visible on all screens direct in navbar */}
               <button 
                 onClick={() => cart.setOpen(true)}
-                className="relative p-1.5 sm:p-2 text-foreground/80 hover:text-primary transition-all duration-300" 
+                className="relative p-3 text-foreground/80 hover:text-primary transition-all duration-300" 
                 aria-label={t.cart.title}
               >
-                <ShoppingBag className="h-4.5 w-4.5 sm:h-5 sm:w-5 md:h-4 md:w-4" />
+                <ShoppingBag className="h-5 w-5 md:h-4 md:w-4" />
                 {count > 0 && (
-                  <span className="absolute top-1 right-1 sm:-top-1.5 sm:-end-1 bg-primary text-primary-foreground text-[7px] sm:text-[9px] font-bold rounded-full h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
+                  <span className="absolute top-1.5 right-1.5 sm:-top-1.5 sm:-end-1 bg-primary text-primary-foreground text-[7px] sm:text-[9px] font-bold rounded-full h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center">
                     {count}
                   </span>
                 )}
@@ -221,7 +246,7 @@ export function Header() {
         {/* Main Desktop Nav (Only when NOT scrolled) */}
         <nav className={cn(
           "hidden lg:block border-t border-border/5 transition-all duration-700 ease-luxury mt-6",
-          isScrolled ? "max-h-0 opacity-0 overflow-hidden pointer-events-none mt-0" : "max-h-24 opacity-100"
+          (isScrolled || !isHomePage) ? "max-h-0 opacity-0 overflow-hidden pointer-events-none mt-0" : "max-h-24 opacity-100"
         )}>
           <div className="container-luxury flex items-center justify-center gap-16 py-6">
             <NavLink to="/shop" className="nav-link text-[13px] tracking-[0.25em] font-semibold">{t.nav.shop}</NavLink>
@@ -295,7 +320,7 @@ export function Header() {
           </div>
           <button 
             onClick={() => setOpenMobile(false)} 
-            className="text-foreground/90 hover:text-primary transition-colors p-2"
+            className="text-foreground/90 hover:text-primary transition-colors p-3"
             aria-label="Close Menu"
           >
             <X className="h-8 w-8" />
@@ -318,7 +343,7 @@ export function Header() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/60" />
             </form>
 
-            <Link to="/shop" onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-foreground hover:text-primary transition-colors font-semibold">
+            <Link to="/shop" onClick={() => setOpenMobile(false)} className="text-3xl sm:text-2xl font-display tracking-[0.1em] text-foreground hover:text-primary transition-colors font-semibold py-3 w-full text-center">
               {t.nav.shop}
             </Link>
 
@@ -326,10 +351,11 @@ export function Header() {
             <div className="w-full flex flex-col items-center border-y border-border/5 py-8">
               <button 
                 onClick={() => setOpenDressesMobile(!openDressesMobile)}
-                className="text-2xl font-display tracking-[0.1em] text-foreground flex items-center gap-3 hover:text-primary transition-colors font-semibold"
+                className="text-3xl sm:text-2xl font-display tracking-[0.1em] text-foreground flex items-center gap-3 hover:text-primary transition-colors font-semibold py-3 w-full justify-center"
               >
                 {t.nav.dresses} <ChevronDown className={cn("h-6 w-6 transition-transform", openDressesMobile && "rotate-180")} />
               </button>
+
               
               <div className={cn(
                 "overflow-hidden transition-all duration-500 w-full",
@@ -341,7 +367,7 @@ export function Header() {
                       key={sub.to} 
                       to={sub.to} 
                       onClick={() => setOpenMobile(false)} 
-                      className="text-sm uppercase tracking-[0.15em] text-foreground/70 hover:text-primary transition-colors font-semibold"
+                      className="text-sm uppercase tracking-[0.15em] text-foreground/70 hover:text-primary transition-colors font-semibold py-3 block w-full"
                     >
                       {sub.label}
                     </Link>
@@ -350,12 +376,12 @@ export function Header() {
               </div>
             </div>
 
-            <Link to="/about" onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-foreground hover:text-primary transition-colors font-semibold">
+            <Link to="/about" onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-foreground hover:text-primary transition-colors font-semibold py-3 w-full text-center">
               {t.nav.about}
             </Link>
 
             {/* Explicit Login/Profile link for mobile */}
-            <Link to={accountLink} onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-primary hover:text-primary-glow transition-colors font-semibold">
+            <Link to={accountLink} onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-primary hover:text-primary-glow transition-colors font-semibold py-3 w-full text-center">
               {isAuthenticated ? t.common.account : (locale === "ar" ? "تسجيل الدخول" : locale === "tr" ? "Giriş Yap" : "Login")}
             </Link>
             
@@ -369,7 +395,7 @@ export function Header() {
                     key={l} 
                     onClick={() => setLocale(l)} 
                     className={cn(
-                      "text-sm uppercase tracking-[0.2em] transition-all",
+                      "text-sm uppercase tracking-[0.2em] transition-all p-3",
                       l === locale ? "text-primary font-bold border-b border-primary/50 pb-1" : "text-foreground/40 hover:text-foreground/60"
                     )}
                   >
@@ -380,20 +406,20 @@ export function Header() {
             </div>
             
             <div className="grid grid-cols-3 gap-6 w-full mt-10 pt-10 border-t border-border/5 text-center">
-              <Link to={accountLink} onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors">
+              <Link to={accountLink} onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3">
                 <User className="h-6 w-6 text-foreground/60" />
-                <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{t.common.account}</span>
+                <span className="text-xs sm:text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{t.common.account}</span>
               </Link>
-              <Link to="/wishlist" onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors">
+              <Link to="/wishlist" onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3">
                 <Heart className="h-6 w-6 text-foreground/60" />
-                <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{t.wishlist.title}</span>
+                <span className="text-xs sm:text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{t.wishlist.title}</span>
               </Link>
               <button 
                 onClick={() => { setOpenMobile(false); cart.setOpen(true); }} 
-                className="flex flex-col items-center gap-2 hover:text-primary transition-colors"
+                className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3"
               >
                 <ShoppingBag className="h-6 w-6 text-foreground/60" />
-                <span className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{locale === "ar" ? "السلة" : locale === "tr" ? "Sepet" : "Cart"}</span>
+                <span className="text-xs sm:text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{locale === "ar" ? "السلة" : locale === "tr" ? "Sepet" : "Cart"}</span>
               </button>
             </div>
           </div>
