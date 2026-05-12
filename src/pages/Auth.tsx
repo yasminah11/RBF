@@ -4,8 +4,6 @@ import { Ornament } from "@/components/Ornament";
 import { User, Mail, Lock, Loader2, ArrowRight, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { cn } from "@/lib/utils";
 import { useI18n } from "@/i18n/I18nContext";
 
 type AuthMode = "login" | "register";
@@ -23,55 +21,25 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
     
-    const inputEmail = email.trim().toLowerCase();
-    const inputPassword = password.trim();
-
-    try {
+    // Prototype mode: Always succeed after a short delay
+    setTimeout(() => {
       if (mode === "register") {
-        const { data, error } = await supabase.auth.signUp({
-          email: inputEmail,
-          password: inputPassword,
-          options: {
-            data: {
-              full_name: fullName,
-            },
-          },
+        toast.success((t as any).auth.accountCreated, {
+          description: "Your account is ready. You can now sign in."
         });
-
-        if (error) throw error;
-        
-        if (data.user) {
-          toast.success((t as any).auth.accountCreated, {
-            description: (t as any).auth.verifyEmail
-          });
-          setMode("login");
-        }
+        setMode("login");
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: inputEmail,
-          password: inputPassword,
+        toast.success((t as any).auth.welcomeBack, {
+          description: (t as any).auth.personalBoutique
         });
-
-        if (error) throw error;
-
-        if (data.user) {
-          toast.success((t as any).auth.welcomeBack, {
-            description: (t as any).auth.personalBoutique
-          });
-          navigate("/");
-        }
+        navigate("/");
       }
-    } catch (error: any) {
-      toast.error((t as any).auth.failed, {
-        description: error.message || (t as any).auth.invalid
-      });
-    } finally {
       setLoading(false);
-    }
+    }, 1000);
   };
 
   return (
-    <div className="container-luxury py-20 md:py-32 flex justify-center items-center min-h-[70vh]">
+    <div className="container-luxury py-8 md:py-12 flex justify-center items-center min-h-[70vh]">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

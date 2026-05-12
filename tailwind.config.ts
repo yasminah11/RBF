@@ -9,7 +9,7 @@ export default {
     extend: {
       fontFamily: {
         display: ["'Cormorant Garamond'", "serif"],
-        sans: ["Jost", "system-ui", "sans-serif"],
+        sans: ["Inter", "Jost", "system-ui", "sans-serif"],
         arabic: ["'IBM Plex Sans Arabic'", "system-ui", "sans-serif"],
       },
       colors: {

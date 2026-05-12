@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Globe, Heart, Search, ShoppingBag, User, Menu, X, ChevronDown, ArrowRight } from "lucide-react";
+import { Globe, Heart, Search, ShoppingBag, Menu, X, ChevronDown, ArrowRight } from "lucide-react";
 import { useI18n } from "@/i18n/I18nContext";
 import { useState, useEffect, useRef } from "react";
 import { useCart, cartCount, useCartDrawer, cart } from "@/store/cart";
@@ -8,7 +8,6 @@ import { LOCALES } from "@/i18n/translations";
 import { NavLink } from "./NavLink";
 import { cn } from "@/lib/utils";
 import { CartDrawer } from "./CartDrawer";
-import { supabase } from "@/integrations/supabase/client";
 
 export function Header() {
   const { t, locale, setLocale } = useI18n();
@@ -26,25 +25,10 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const items = useCart();
   const wishlistItems = useWishlist();
   const count = cartCount(items);
   const wishlistCount = wishlistItems.length;
-
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setIsAuthenticated(!!session);
-    });
-
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setIsAuthenticated(!!session);
-    };
-    checkAuth();
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -109,13 +93,11 @@ export function Header() {
   };
 
   const dressSubcategories = [
-    { to: "/category/long-evening-dresses", label: t.nav.longDresses },
-    { to: "/category/short-evening-dresses", label: t.nav.shortDresses },
-    { to: "/category/graduation-evening-dresses", label: t.nav.graduationDresses },
-    { to: "/category/mermaid-style-evening-dresses", label: t.nav.mermaidDresses },
+    { to: "/category/modest-dresses", label: t.nav.modestDresses },
+    { to: "/category/evening-dresses", label: t.nav.eveningDresses },
+    { to: "/category/wedding-dresses", label: t.nav.weddingDresses },
+    { to: "/category/engagement-dresses", label: t.nav.engagementDresses },
   ];
-
-  const accountLink = isAuthenticated ? "/profile" : "/auth";
 
   return (
     <>
@@ -133,7 +115,7 @@ export function Header() {
           <div className="flex items-center gap-1 sm:gap-4 flex-1">
             <button 
               onClick={() => setOpenMobile(true)} 
-              className="lg:hidden text-foreground/90 hover:text-primary transition-colors p-3 -ms-3" 
+              className="lg:hidden text-foreground hover:text-primary hover:scale-105 transition-all p-3 -ms-3" 
               aria-label="Open Menu"
             >
               <Menu className="h-6 w-6" />
@@ -143,7 +125,7 @@ export function Header() {
               {/* Desktop Search - Hidden on mobile */}
               <button 
                 onClick={() => setShowSearch(true)}
-                className="hidden lg:flex text-foreground/80 hover:text-primary transition-all duration-300 p-1.5" 
+                className="hidden lg:flex text-foreground hover:text-primary hover:scale-105 transition-all duration-300 p-1.5" 
                 aria-label={t.common.search}
               >
                 <Search className="h-4 w-4" />
@@ -153,7 +135,7 @@ export function Header() {
               <div className="relative">
                 <button 
                   onClick={() => setOpenLang(!openLang)} 
-                  className="flex items-center gap-1.5 text-foreground/80 hover:text-primary transition-colors text-[10px] sm:text-[11px] uppercase tracking-widest font-semibold p-3" 
+                  className="flex items-center gap-1.5 text-cream hover:text-primary hover:scale-105 transition-all text-xs sm:text-sm uppercase tracking-widest font-bold drop-shadow-md p-3 rtl:tracking-normal" 
                   aria-label={t.common.selectLanguage}
                 >
                   <Globe className="h-4.5 w-4.5 sm:h-4 sm:w-4" />
@@ -166,8 +148,8 @@ export function Header() {
                         key={l}
                         onClick={() => { setLocale(l); setOpenLang(false); }}
                         className={cn(
-                          "block w-full text-start px-5 py-3 text-[10px] uppercase tracking-widest transition-all duration-300 hover:bg-primary/10 hover:ps-6",
-                          l === locale ? "text-primary font-bold" : "text-foreground/80"
+                          "block w-full text-start px-5 py-3 text-xs uppercase tracking-widest transition-all duration-300 hover:bg-primary/10 hover:ps-6 rtl:tracking-normal",
+                          l === locale ? "text-primary font-bold" : "text-cream font-bold"
                         )}
                       >
                         {l === "ar" ? "العربية" : l === "tr" ? "Türkçe" : "English"}
@@ -208,16 +190,11 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Right: Icons (Wishlist & Cart visible on all, Account moved to menu on mobile) */}
+          {/* Right: Icons (Wishlist & Cart visible on all) */}
           <div className="flex items-center gap-1 sm:gap-4 md:gap-6 flex-1 justify-end">
             <div className="flex items-center gap-0.5 sm:gap-3 md:gap-5">
-              {/* Account Icon - Hidden on mobile navbar, moved to menu */}
-              <Link to={accountLink} className="hidden lg:flex p-1.5 sm:p-2 text-foreground/80 hover:text-primary transition-all duration-300" aria-label={t.common.account}>
-                <User className="h-4.5 w-4.5 sm:h-5 sm:w-5 md:h-4 md:w-4" />
-              </Link>
-              
               {/* Wishlist - Visible on all screens direct in navbar */}
-              <Link to="/wishlist" className="relative p-3 text-foreground/80 hover:text-primary transition-all duration-300" aria-label={t.wishlist.title}>
+              <Link to="/wishlist" className="relative p-3 text-foreground hover:text-primary hover:scale-105 transition-all duration-300" aria-label={t.wishlist.title}>
                 <Heart className={cn("h-5 w-5 md:h-4 md:w-4", wishlistCount > 0 && "fill-primary text-primary")} />
                 {wishlistCount > 0 && (
                   <span className="absolute top-1.5 right-1.5 sm:-top-1.5 sm:-end-1 bg-primary text-primary-foreground text-[7px] sm:text-[9px] font-bold rounded-full h-3 w-3 sm:h-4 sm:w-4 flex items-center justify-center animate-in zoom-in">
@@ -229,7 +206,7 @@ export function Header() {
               {/* Cart - Visible on all screens direct in navbar */}
               <button 
                 onClick={() => cart.setOpen(true)}
-                className="relative p-3 text-foreground/80 hover:text-primary transition-all duration-300" 
+                className="relative p-3 text-foreground hover:text-primary hover:scale-105 transition-all duration-300" 
                 aria-label={t.cart.title}
               >
                 <ShoppingBag className="h-5 w-5 md:h-4 md:w-4" />
@@ -249,11 +226,11 @@ export function Header() {
           (isScrolled || !isHomePage) ? "max-h-0 opacity-0 overflow-hidden pointer-events-none mt-0" : "max-h-24 opacity-100"
         )}>
           <div className="container-luxury flex items-center justify-center gap-16 py-6">
-            <NavLink to="/shop" className="nav-link text-[13px] tracking-[0.25em] font-semibold">{t.nav.shop}</NavLink>
+            <NavLink to="/shop" className="nav-link">{t.nav.shop}</NavLink>
             
             {/* Dresses Dropdown */}
             <div className="relative group/dropdown">
-              <button className="nav-link text-[13px] tracking-[0.25em] font-semibold flex items-center gap-2">
+              <button className="nav-link flex items-center gap-2">
                 {t.nav.dresses} <ChevronDown className="h-4 w-4 transition-transform group-hover/dropdown:rotate-180" />
               </button>
               
@@ -263,7 +240,7 @@ export function Header() {
                     <Link 
                       key={sub.to} 
                       to={sub.to} 
-                      className="block w-full text-start px-6 py-4 text-[10px] uppercase tracking-[0.15em] text-foreground/80 hover:text-primary hover:bg-primary/5 transition-all duration-300"
+                      className="block w-full text-start px-6 py-4 text-xs md:text-sm uppercase tracking-[0.15em] font-bold text-cream hover:text-primary hover:bg-primary/5 transition-all duration-300 rtl:tracking-normal"
                     >
                       {sub.label}
                     </Link>
@@ -272,7 +249,7 @@ export function Header() {
               </div>
             </div>
 
-            <NavLink to="/about" className="nav-link text-[13px] tracking-[0.25em] font-semibold">{t.nav.about}</NavLink>
+            <NavLink to="/about" className="nav-link">{t.nav.about}</NavLink>
           </div>
         </nav>
       </header>
@@ -343,15 +320,15 @@ export function Header() {
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/60" />
             </form>
 
-            <Link to="/shop" onClick={() => setOpenMobile(false)} className="text-3xl sm:text-2xl font-display tracking-[0.1em] text-foreground hover:text-primary transition-colors font-semibold py-3 w-full text-center">
+            <NavLink to="/shop" onClick={() => setOpenMobile(false)} className="text-4xl sm:text-3xl font-display tracking-[0.05em] text-cream drop-shadow-md hover:text-primary transition-colors font-bold py-3 w-full text-center block rtl:tracking-normal">
               {t.nav.shop}
-            </Link>
+            </NavLink>
 
             {/* Mobile Dresses Dropdown */}
             <div className="w-full flex flex-col items-center border-y border-border/5 py-8">
               <button 
                 onClick={() => setOpenDressesMobile(!openDressesMobile)}
-                className="text-3xl sm:text-2xl font-display tracking-[0.1em] text-foreground flex items-center gap-3 hover:text-primary transition-colors font-semibold py-3 w-full justify-center"
+                className="text-4xl sm:text-3xl font-display tracking-[0.05em] text-cream drop-shadow-md flex items-center gap-3 hover:text-primary transition-colors font-bold py-3 w-full justify-center rtl:tracking-normal"
               >
                 {t.nav.dresses} <ChevronDown className={cn("h-6 w-6 transition-transform", openDressesMobile && "rotate-180")} />
               </button>
@@ -363,27 +340,22 @@ export function Header() {
               )}>
                 <div className="flex flex-col gap-6 py-6 bg-primary/5 rounded-lg text-center">
                   {dressSubcategories.map((sub) => (
-                    <Link 
+                    <NavLink 
                       key={sub.to} 
                       to={sub.to} 
                       onClick={() => setOpenMobile(false)} 
-                      className="text-sm uppercase tracking-[0.15em] text-foreground/70 hover:text-primary transition-colors font-semibold py-3 block w-full"
+                      className="text-base uppercase tracking-[0.15em] font-bold text-cream drop-shadow-sm hover:text-primary transition-colors py-3 block w-full rtl:tracking-normal"
                     >
                       {sub.label}
-                    </Link>
+                    </NavLink>
                   ))}
                 </div>
               </div>
             </div>
 
-            <Link to="/about" onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-foreground hover:text-primary transition-colors font-semibold py-3 w-full text-center">
+            <NavLink to="/about" onClick={() => setOpenMobile(false)} className="text-3xl sm:text-2xl font-display tracking-[0.05em] text-cream drop-shadow-md hover:text-primary transition-colors font-bold py-3 w-full text-center block rtl:tracking-normal">
               {t.nav.about}
-            </Link>
-
-            {/* Explicit Login/Profile link for mobile */}
-            <Link to={accountLink} onClick={() => setOpenMobile(false)} className="text-2xl font-display tracking-[0.1em] text-primary hover:text-primary-glow transition-colors font-semibold py-3 w-full text-center">
-              {isAuthenticated ? t.common.account : (locale === "ar" ? "تسجيل الدخول" : locale === "tr" ? "Giriş Yap" : "Login")}
-            </Link>
+            </NavLink>
             
             <div className="w-16 h-px bg-primary/30 my-6" />
             
@@ -395,8 +367,8 @@ export function Header() {
                     key={l} 
                     onClick={() => setLocale(l)} 
                     className={cn(
-                      "text-sm uppercase tracking-[0.2em] transition-all p-3",
-                      l === locale ? "text-primary font-bold border-b border-primary/50 pb-1" : "text-foreground/40 hover:text-foreground/60"
+                      "text-base uppercase tracking-[0.2em] font-bold transition-all p-3 rtl:tracking-normal",
+                      l === locale ? "text-primary border-b border-primary/50 pb-1" : "text-cream hover:text-primary"
                     )}
                   >
                     {l.toUpperCase()}
@@ -405,21 +377,17 @@ export function Header() {
               </div>
             </div>
             
-            <div className="grid grid-cols-3 gap-6 w-full mt-10 pt-10 border-t border-border/5 text-center">
-              <Link to={accountLink} onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3">
-                <User className="h-6 w-6 text-foreground/60" />
-                <span className="text-xs sm:text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{t.common.account}</span>
-              </Link>
-              <Link to="/wishlist" onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3">
-                <Heart className="h-6 w-6 text-foreground/60" />
-                <span className="text-xs sm:text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{t.wishlist.title}</span>
-              </Link>
+            <div className="grid grid-cols-2 gap-6 w-full mt-10 pt-10 border-t border-border/5 text-center">
+              <NavLink to="/wishlist" onClick={() => setOpenMobile(false)} className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3 group">
+                <Heart className="h-6 w-6 text-cream drop-shadow-sm group-hover:scale-110 transition-transform" />
+                <span className="text-xs sm:text-sm uppercase tracking-widest font-bold text-cream drop-shadow-sm rtl:tracking-normal">{t.wishlist.title}</span>
+              </NavLink>
               <button 
                 onClick={() => { setOpenMobile(false); cart.setOpen(true); }} 
-                className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3"
+                className="flex flex-col items-center gap-2 hover:text-primary transition-colors py-3 group"
               >
-                <ShoppingBag className="h-6 w-6 text-foreground/60" />
-                <span className="text-xs sm:text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{locale === "ar" ? "السلة" : locale === "tr" ? "Sepet" : "Cart"}</span>
+                <ShoppingBag className="h-6 w-6 text-cream drop-shadow-sm group-hover:scale-110 transition-transform" />
+                <span className="text-xs sm:text-sm uppercase tracking-widest font-bold text-cream drop-shadow-sm rtl:tracking-normal">{locale === "ar" ? "السلة" : locale === "tr" ? "Sepet" : "Cart"}</span>
               </button>
             </div>
           </div>

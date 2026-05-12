@@ -19,7 +19,7 @@ export default function About() {
   }[locale];
 
   return (
-    <div className="container-luxury py-20 max-w-3xl">
+    <div className="container-luxury py-8 md:py-10 max-w-3xl">
       <div className="text-center">
         <h1 className="font-display text-6xl sm:text-5xl text-cream">{content.title}</h1>
         <Ornament />

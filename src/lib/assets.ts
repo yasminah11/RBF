@@ -53,9 +53,10 @@ const productMap: Record<string, string> = {
 
 // Category Slug to Image Mapping (Case-insensitive)
 const catMap: Record<string, string> = {
-  "dresses": catDresses,
-  "outerwear": catOuterwear,
-  "accessories": catAccessories,
+  "modest-dresses": catDresses,
+  "evening-dresses": catDresses,
+  "wedding-dresses": catDresses,
+  "engagement-dresses": catDresses,
 };
 
 /**

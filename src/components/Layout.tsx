@@ -7,7 +7,7 @@ export function Layout() {
     <div className="min-h-screen flex flex-col">
       <Header />
       {/* Spacer for fixed header - adjusted height after removing announcement bar */}
-      <div className="h-[80px] md:h-[120px]" />
+      <div className="h-[64px] md:h-[96px]" />
       <main className="flex-1">
         <Outlet />
       </main>

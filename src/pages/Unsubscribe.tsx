@@ -42,7 +42,7 @@ export default function Unsubscribe() {
   }, [token, locale]);
 
   return (
-    <div className="container-luxury py-20 md:py-32 flex justify-center items-center min-h-[60vh]">
+    <div className="container-luxury py-8 md:py-12 flex justify-center items-center min-h-[60vh]">
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}

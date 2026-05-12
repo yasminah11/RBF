@@ -1,6 +1,6 @@
 # Royal Brands Fashion — Luxury Fashion
 
-Refined luxury fashion for women. Evening gowns, outerwear, and accessories crafted with timeless elegance.
+Refined luxury fashion for women. Modest, Evening, Wedding, and Engagement dresses crafted with timeless elegance.
 
 ## Tech Stack
 

@@ -12,7 +12,7 @@ export default function Cart() {
   const total = cartTotal(items);
 
   return (
-    <div className="container-luxury py-10 md:py-16 min-h-[70vh]">
+    <div className="container-luxury py-8 md:py-12 min-h-[70vh]">
       <div className="text-center mb-10 px-4">
         <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.4em] text-primary mb-3">Your Selection</p>
         <h1 className="font-display text-4xl sm:text-3xl md:text-5xl text-cream">{t.cart.title}</h1>
@@ -23,7 +23,7 @@ export default function Cart() {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-20 px-4 bg-card/20 border border-dashed border-border/20 max-w-2xl mx-auto rounded-lg flex flex-col items-center"
+          className="text-center py-12 px-4 bg-card/20 border border-dashed border-border/20 max-w-2xl mx-auto rounded-lg flex flex-col items-center"
         >
           <div className="bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
             <ShoppingBag className="text-primary w-8 h-8" />

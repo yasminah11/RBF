@@ -113,7 +113,7 @@ export default function Checkout() {
 
   if (items.length === 0) {
     return (
-      <div className="container-luxury py-32 text-center">
+      <div className="container-luxury py-12 text-center">
         <h2 className="font-display text-4xl sm:text-3xl text-cream mb-6">{t.product.selectionNotFound}</h2>
         <p className="text-xl sm:text-muted-foreground mb-10">{t.cart.empty}</p>
         <Link to="/shop" className="bg-primary text-primary-foreground px-8 py-3 text-sm sm:text-[10px] uppercase tracking-widest font-bold">
@@ -134,8 +134,8 @@ export default function Checkout() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
           <div className="lg:col-span-7 space-y-12">
-            
-            {/* Shipping Information Section */}
+
+            {/* Shipping Information Section (Second) */}
             <section className="bg-card/40 backdrop-blur-sm border border-border/10 p-6 md:p-8 space-y-8">
               <div className="flex items-center gap-3 border-b border-border/10 pb-4">
                 <User className="h-5 w-5 text-primary" />
@@ -238,7 +238,7 @@ export default function Checkout() {
               </div>
             </section>
 
-            {/* NEW Refactored Payment Section */}
+            {/* NEW Refactored Payment Section (Second) */}
             <PaymentSection 
               items={items}
               totalAmount={total}

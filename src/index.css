@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* ==========================================================================
    Royal Brands Fashion — Luxury Design System
    Deep Navy + Rich Gold. All colors HSL.
@@ -65,7 +67,7 @@
     @apply border-border;
   }
   html {
-    font-family: 'Tenor Sans', system-ui, sans-serif;
+    font-family: 'Inter', 'Tenor Sans', system-ui, sans-serif;
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
   }
@@ -85,13 +87,16 @@
     @apply bg-background text-foreground antialiased overflow-x-hidden;
     font-feature-settings: "ss01", "ss02";
     line-height: 1.6;
-    font-weight: 300;
+    font-weight: 400; /* Increased from 300 for better readability */
     width: 100%;
   }
-  h1, h2, h3, h4, h5, .font-display {
-    font-family: 'Bodoni Moda', serif;
-    @apply font-semibold md:font-normal;
-    letter-spacing: 0.01em;
+  h1, h2, h3, h4, h5 {
+    @apply font-bold tracking-tight;
+  }
+  .font-display {
+    font-family: 'Inter', sans-serif;
+    @apply font-bold;
+    letter-spacing: -0.02em;
   }
   h1 { @apply text-4xl sm:text-4xl md:text-5xl lg:text-6xl; }
   h2 { @apply text-3xl sm:text-3xl md:text-4xl lg:text-5xl; }
@@ -103,8 +108,8 @@
   html[lang="ar"] h4,
   html[lang="ar"] h5,
   html[lang="ar"] .font-display {
-    font-family: 'Amiri', serif;
-    font-weight: 500;
+    font-family: 'IBM Plex Sans Arabic', sans-serif;
+    font-weight: 600;
     letter-spacing: 0;
   }
 }
@@ -144,15 +149,19 @@
 
   /* Nav link gold underline */
   .nav-link {
-    @apply relative inline-block py-1 text-sm uppercase tracking-[0.18em] text-foreground/85 transition-all duration-300 hover:text-primary hover:-translate-y-0.5 font-normal;
+    @apply relative inline-block py-1 text-[13px] md:text-[14px] uppercase tracking-[0.2em] text-cream drop-shadow-md transition-all duration-300 hover:text-primary hover:-translate-y-0.5 font-semibold;
   }
   .nav-link::after {
     content: "";
     @apply absolute bottom-0 start-0 h-px w-0 bg-primary transition-all duration-500 ease-luxury;
   }
   .nav-link:hover::after,
+  .nav-link.active::after,
   .nav-link[data-active="true"]::after {
     @apply w-full;
+  }
+  .nav-link.active {
+    @apply text-primary font-bold;
   }
 
   .perspective-1000 {
@@ -206,4 +215,19 @@
 /* RTL adjustments */
 html[dir="rtl"] .nav-link::after {
   @apply right-0 left-auto;
+}
+html[dir="rtl"] .nav-link {
+  @apply tracking-normal text-[15px] md:text-[16px] font-semibold;
+}
+html[dir="rtl"] .tracking-\[0\.05em\],
+html[dir="rtl"] .tracking-\[0\.1em\],
+html[dir="rtl"] .tracking-\[0\.15em\],
+html[dir="rtl"] .tracking-\[0\.18em\],
+html[dir="rtl"] .tracking-\[0\.2em\],
+html[dir="rtl"] .tracking-\[0\.25em\],
+html[dir="rtl"] .tracking-\[0\.3em\],
+html[dir="rtl"] .tracking-\[0\.4em\],
+html[dir="rtl"] .tracking-\[0\.5em\],
+html[dir="rtl"] .tracking-widest {
+  letter-spacing: 0 !important;
 }
