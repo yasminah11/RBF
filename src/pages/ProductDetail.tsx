@@ -30,7 +30,7 @@ export default function ProductDetail() {
     (async () => {
       setLoading(true);
       try {
-        const { data } = await supabase.from("products").select("*").eq("slug", slug).maybeSingle();
+        const { data } = await supabase.from("products").select("*, product_sizes(*)").eq("slug", slug).maybeSingle();
         if (data) {
           setProduct(data);
           const { data: rel } = await supabase.from("products").select("*").eq("category_id", data.category_id).neq("id", data.id).limit(4);
@@ -100,7 +100,9 @@ export default function ProductDetail() {
 
   const name = localizedField(p, "name", locale);
   const desc = localizedField(p, "description", locale);
-  const sizes = ["36", "38", "40", "42", "44"]; // Mock sizes
+  const sizes = p.product_sizes 
+    ? [...p.product_sizes].sort((a: any, b: any) => (a.position || 0) - (b.position || 0)).map((s: any) => s.size_label)
+    : [];
 
   return (
     <div className="pb-20 overflow-x-hidden">

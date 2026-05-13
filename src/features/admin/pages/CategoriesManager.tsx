@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { 
   Plus, 
   Search, 
@@ -55,8 +55,6 @@ const INITIAL_CATEGORIES: Category[] = [
   { id: "2", order: 2, name_en: "Evening Dresses", name_ar: "فساتين سهرة", name_tr: "Abiye Elbiseler", slug: "evening-dresses", status: "active", productCount: 45 },
   { id: "3", order: 3, name_en: "Wedding Dresses", name_ar: "فساتين زفاف", name_tr: "Gelinlikler", slug: "wedding-dresses", status: "active", productCount: 12 },
   { id: "4", order: 4, name_en: "Engagement Dresses", name_ar: "فساتين خطوبة", name_tr: "Nişan Elbiseleri", slug: "engagement-dresses", status: "active", productCount: 18 },
-  { id: "5", order: 5, name_en: "Long Evening Dresses", name_ar: "فساتين سهرة طويلة", name_tr: "Uzun Abiye Elbiseler", slug: "long-evening-dresses", status: "active", productCount: 15, parentId: "2" },
-  { id: "6", order: 6, name_en: "Short Evening Dresses", name_ar: "فساتين سهرة قصيرة", name_tr: "Kısa Abiye Elbiseler", slug: "short-evening-dresses", status: "active", productCount: 10, parentId: "2" },
 ];
 
 export function CategoriesManager() {
@@ -65,6 +63,22 @@ export function CategoriesManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const openModal = (category: Category | null = null) => {
+    setCurrentCategory(category);
+    setImagePreview(null);
+    setIsModalOpen(true);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setImagePreview(url);
+    }
+  };
 
   const filteredCategories = categories
     .filter(c => 
@@ -105,6 +119,7 @@ export function CategoriesManager() {
       description_tr: formData.get("description_tr") as string,
       status: formData.get("status") === "active" ? "active" : "inactive",
       productCount: currentCategory?.productCount || 0,
+      image: imagePreview || currentCategory?.image,
       parentId: formData.get("parentId") === "none" ? undefined : formData.get("parentId") as string,
     };
 
@@ -132,7 +147,7 @@ export function CategoriesManager() {
           <h1 className="font-display text-3xl text-primary">{t.admin.categories.title}</h1>
           <p className="text-muted-foreground">Manage your store dress collections</p>
         </div>
-        <Button onClick={() => { setCurrentCategory(null); setIsModalOpen(true); }} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold">
+        <Button onClick={() => openModal(null)} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold">
           <Plus className="h-4 w-4 mr-2 rtl:ml-2" />
           {t.admin.categories.addCategory}
         </Button>
@@ -205,7 +220,7 @@ export function CategoriesManager() {
                   </td>
                   <td className="px-6 py-4 text-right rtl:text-left">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" onClick={() => { setCurrentCategory(cat); setIsModalOpen(true); }} className="h-8 w-8 text-primary">
+                      <Button variant="ghost" size="icon" onClick={() => openModal(cat)} className="h-8 w-8 text-primary">
                         <Edit2 className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => toggleStatus(cat.id)} className="h-8 w-8 text-destructive">
@@ -266,9 +281,30 @@ export function CategoriesManager() {
                 
                 <div className="space-y-2">
                   <Label className="text-xs uppercase tracking-widest text-muted-foreground">{t.admin.categories.modal.image}</Label>
-                  <div className="h-32 rounded border border-dashed border-border flex flex-col items-center justify-center gap-2 bg-background group cursor-pointer hover:bg-muted/30 transition-colors">
-                    <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
-                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Upload Image</span>
+                  <div 
+                    className="h-32 rounded border border-dashed border-border flex flex-col items-center justify-center gap-2 bg-background group cursor-pointer hover:bg-muted/30 transition-colors relative overflow-hidden"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    {imagePreview || currentCategory?.image ? (
+                      <>
+                        <img src={imagePreview || currentCategory?.image} alt="Preview" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Upload className="h-6 w-6 text-white" />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-6 w-6 text-muted-foreground group-hover:text-primary" />
+                        <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Upload Image</span>
+                      </>
+                    )}
+                    <input 
+                      type="file" 
+                      ref={fileInputRef} 
+                      className="hidden" 
+                      accept="image/*" 
+                      onChange={handleImageChange} 
+                    />
                   </div>
                 </div>
 

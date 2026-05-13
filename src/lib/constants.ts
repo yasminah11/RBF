@@ -3,12 +3,8 @@ import { type ProductCardData } from "@/components/ProductCard";
 export type Category = { id: string; slug: string; name_ar: string; name_en: string; name_tr: string; image: string | null };
 
 export const MOCK_PRODUCTS: ProductCardData[] = [
-  { id: "1", sku: "LFB-001", slug: "elegant-long-gown", name_en: "Long Silk Evening Gown", name_ar: "فستان سهرة طويل من الحرير", name_tr: "Uzun İpek Abiye Elbise", price: 1250, is_on_sale: false, sale_price: null },
-  { id: "3", sku: "LFB-003", slug: "silk-short-dress", name_en: "Short Silk Wrap Dress", name_ar: "فستان سهرة قصير ملفوف", name_tr: "Kısa İpek Kruvaze Elbise", price: 850, is_on_sale: true, sale_price: 650, sale_label_en: "Sale" },
   { id: "4", sku: "LFB-004", slug: "graduation-lace-dress", name_en: "Graduation Lace Dress", name_ar: "فستان تخرج من الدانتيل", name_tr: "Dantelli Mezuniyet Elbisesi", price: 1500, is_on_sale: false, sale_price: null },
   { id: "5", sku: "LFB-005", slug: "mermaid-evening-dress", name_en: "Mermaid Style Evening Dress", name_ar: "فستان سهرة بتصميم حورية البحر", name_tr: "Balık Model Abiye Elbise", price: 1100, is_on_sale: false, sale_price: null },
-  { id: "6", sku: "LFB-006", slug: "satin-long-dress", name_en: "Long Satin Evening Dress", name_ar: "فستان سهرة طويل من الساتان", name_tr: "Uzun Saten Abiye Elbise", price: 450, is_on_sale: false, sale_price: null },
-  { id: "7", sku: "LFB-007", slug: "short-cocktail-dress", name_en: "Short Cocktail Dress", name_ar: "فستان كوكتيل قصير", name_tr: "Kısa Kokteyl Elbisesi", price: 350, is_on_sale: false, sale_price: null },
   { id: "8", sku: "LFB-008", slug: "graduation-classic-gown", name_en: "Classic Graduation Gown", name_ar: "فستان تخرج كلاسيكي", name_tr: "Klasik Mezuniyet Elbisesi", price: 200, is_on_sale: false, sale_price: null },
   { id: "9", sku: "LFB-009", slug: "mermaid-velvet-gown", name_en: "Mermaid Velvet Gown", name_ar: "فستان حورية البحر من المخمل", name_tr: "Kadife Balık Model Elbise", price: 400, is_on_sale: false, sale_price: null },
 ];
@@ -18,12 +14,10 @@ export const MOCK_PRODUCTS_FULL = MOCK_PRODUCTS.map(p => ({
   description_en: `A masterpiece of contemporary luxury from Royal Brands Fashion. This ${p.name_en.toLowerCase()} is meticulously crafted using the finest materials to ensure unparalleled elegance and comfort.`,
   description_ar: `تحفة فنية من الفخامة المعاصرة من رويال براندز فاشن. صُنع هذا الـ ${p.name_en.toLowerCase()} بعناية فائقة باستخدام أجود المواد لضمان أناقة وراحة لا مثيل لهما.`,
   description_tr: `Royal Brands Fashion'dan çağdaş lüksün bir başyapıtı. Bu ${p.name_en.toLowerCase()}, benzersiz zarafet ve konfor sağlamak için en iyi malzemeler kullanılarak titizlikle üretilmiştir.`,
-  category_id: p.slug.includes("long") ? "c1" : p.slug.includes("short") ? "c2" : p.slug.includes("graduation") ? "c3" : "c4"
+  category_id: p.slug.includes("graduation") ? "c3" : "c4"
 }));
 
 export const MOCK_CATEGORIES: Category[] = [
-  { id: "c1", slug: "long-evening-dresses", name_en: "Long Evening Dresses", name_ar: "فستان سهرة طويل", name_tr: "Uzun Abiye Elbiseler", image: null },
-  { id: "c2", slug: "short-evening-dresses", name_en: "Short Evening Dresses", name_ar: "فستان سهرة قصير", name_tr: "Kısa Abiye Elbiseler", image: null },
   { id: "c3", slug: "graduation-evening-dresses", name_en: "Graduation Evening Dresses", name_ar: "فستان سهرة للتخرج", name_tr: "Mezuniyet Abiye Elbiseleri", image: null },
   { id: "c4", slug: "mermaid-style-evening-dresses", name_en: "Mermaid Style Evening Dresses", name_ar: "فستان سهرة بتصميم حورية البحر", name_tr: "Balık Model Abiye Elbiseler", image: null },
 ];

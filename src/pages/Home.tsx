@@ -11,6 +11,8 @@ import { toast } from "sonner";
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_REVIEWS, type Category } from "@/lib/constants";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
+import { supabase } from "@/integrations/supabase/client";
+
 
 export default function Home() {
   const { t, locale, dir } = useI18n();
@@ -20,8 +22,8 @@ export default function Home() {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // 1. Embla for Hero (3s Autoplay, Swipe enabled)
-  const [emblaRef, emblaApi] = useEmblaCarousel({ 
-    loop: true, 
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
     duration: 30,
     skipSnaps: false,
     direction: dir
@@ -42,8 +44,8 @@ export default function Home() {
   }, [emblaApi, onSelect]);
 
   // 2. Embla for Testimonials
-  const [reviewsRef] = useEmblaCarousel({ 
-    loop: true, 
+  const [reviewsRef] = useEmblaCarousel({
+    loop: true,
     dragFree: true,
     direction: dir
   }, [
@@ -51,10 +53,37 @@ export default function Home() {
   ]);
 
   useEffect(() => {
-    // Pure frontend prototype: Use mock data directly
-    setFeatured(MOCK_PRODUCTS.slice(0, 4));
-    setNewArrivals(MOCK_PRODUCTS.slice(0, 8));
-    setCategories(MOCK_CATEGORIES);
+    const fetchData = async () => {
+      try {
+        const { data: productsData } = await supabase
+          .from("products")
+          .select("*")
+          .eq("status", "active")
+          .order("created_at", { ascending: false });
+
+        const { data: featuredData } = await supabase
+          .from("products")
+          .select("*")
+          .eq("status", "active")
+          .eq("featured", true)
+          .limit(4);
+
+        const { data: categoriesData } = await supabase
+          .from("categories")
+          .select("*")
+          .eq("status", "active")
+          .order("display_order", { ascending: true });
+
+        setFeatured(featuredData?.length ? featuredData as any : MOCK_PRODUCTS.slice(0, 4));
+        setNewArrivals(productsData?.length ? productsData as any : MOCK_PRODUCTS.slice(0, 8));
+        setCategories(categoriesData?.length ? categoriesData as any : MOCK_CATEGORIES);
+      } catch (err) {
+        setFeatured(MOCK_PRODUCTS.slice(0, 4));
+        setNewArrivals(MOCK_PRODUCTS.slice(0, 8));
+        setCategories(MOCK_CATEGORIES);
+      }
+    };
+    fetchData();
   }, []);
 
   const titleWords = t.hero.title.split(' ');
@@ -67,7 +96,7 @@ export default function Home() {
   const onSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || submitting) return;
-    
+
     setSubmitting(true);
     // Mock subscription
     setTimeout(() => {
@@ -98,7 +127,7 @@ export default function Home() {
               </div>
             ))}
           </div>
-          
+
           {/* Static Content Overlay (On top of carousel) */}
           <div className="absolute inset-0 z-10 pointer-events-none">
             <div className="absolute inset-0 bg-background/20" />
@@ -142,7 +171,7 @@ export default function Home() {
         {/* Visual Indicator (The indicator to show it swaps) */}
         <div className="absolute bottom-6 right-6 md:bottom-10 md:right-10 z-30 flex gap-2">
           {heroImages.map((_, i) => (
-            <div 
+            <div
               key={i}
               className={cn(
                 "h-0.5 transition-all duration-500",
@@ -247,9 +276,9 @@ export default function Home() {
       {/* Enhanced Responsive Newsletter Section */}
       <section className="relative min-h-[60vh] md:min-h-[50vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
-            src={coverEmail} 
-            alt="Royal World" 
+          <img
+            src={coverEmail}
+            alt="Royal World"
             className="w-full h-full object-cover object-[center_30%] md:object-center"
           />
           <div className="absolute inset-0 bg-background/40 md:bg-background/50" />
@@ -268,7 +297,7 @@ export default function Home() {
               <p className="text-cream mb-10 max-w-md mx-auto leading-relaxed italic text-base sm:text-sm md:text-lg drop-shadow-sm font-light">
                 {t.sections.newsletterSub}
               </p>
-              
+
               <form
                 onSubmit={onSubscribe}
                 className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto border border-primary/30 rounded-none overflow-hidden bg-background/30 backdrop-blur-md shadow-2xl"
@@ -280,7 +309,7 @@ export default function Home() {
                   placeholder={t.footer.emailPh}
                   className="flex-1 bg-transparent border-none px-6 py-4 text-sm text-cream placeholder:text-cream/50 focus:outline-none focus:ring-0 transition-all text-center sm:text-start"
                 />
-                <button 
+                <button
                   type="submit"
                   disabled={submitting}
                   className="bg-primary text-primary-foreground px-8 py-4 text-xs sm:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20 disabled:opacity-50"
@@ -288,7 +317,7 @@ export default function Home() {
                   {submitting ? '...' : t.footer.subscribe}
                 </button>
               </form>
-              
+
               <p className="mt-8 text-xs sm:text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
                 {t.sections.newsletterFoot}
               </p>

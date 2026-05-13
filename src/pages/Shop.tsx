@@ -28,8 +28,8 @@ export default function Shop() {
             categoryId = (cat as any).id;
             setCategoryName(localizedField(cat as any, "name", locale));
           } else {
-             const mockCat = MOCK_CATEGORIES.find(c => c.slug === slug);
-             setCategoryName(mockCat ? localizedField(mockCat, "name", locale) : slug);
+            const mockCat = MOCK_CATEGORIES.find(c => c.slug === slug);
+            setCategoryName(mockCat ? localizedField(mockCat, "name", locale) : slug);
           }
         } else if (searchQuery) {
           setCategoryName(`${t.common.search}: ${searchQuery}`);
@@ -37,19 +37,19 @@ export default function Shop() {
           setCategoryName(t.nav.shop);
         }
 
-        let q = supabase.from("products").select("*").eq("is_active", true);
+        let q = supabase.from("products").select("*").eq("status", "active");
         if (categoryId) q = q.eq("category_id", categoryId);
-        
+
         if (searchQuery) {
           q = q.or(`name_en.ilike.%${searchQuery}%,name_tr.ilike.%${searchQuery}%,name_ar.ilike.%${searchQuery}%,description_en.ilike.%${searchQuery}%`);
         }
-        
+
         if (sort === "newest") q = q.order("created_at", { ascending: false });
         else if (sort === "price_asc") q = q.order("price", { ascending: true });
         else q = q.order("price", { ascending: false });
-        
+
         const { data } = await q;
-        
+
         if (data && data.length > 0) {
           setProducts(data as any);
         } else {
@@ -63,16 +63,16 @@ export default function Shop() {
               return true;
             });
           }
-          
+
           if (searchQuery) {
             const lowerQuery = searchQuery.toLowerCase();
-            baseProducts = baseProducts.filter(p => 
-              p.name_en.toLowerCase().includes(lowerQuery) || 
-              p.name_tr.toLowerCase().includes(lowerQuery) || 
+            baseProducts = baseProducts.filter(p =>
+              p.name_en.toLowerCase().includes(lowerQuery) ||
+              p.name_tr.toLowerCase().includes(lowerQuery) ||
               p.name_ar.includes(lowerQuery)
             );
           }
-          
+
           setProducts(baseProducts);
         }
       } catch (err) {

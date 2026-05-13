@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Edit2, 
-  Trash2, 
-  Upload, 
-  X, 
-  ChevronLeft, 
+import {
+  Plus,
+  Search,
+  Filter,
+  Edit2,
+  Trash2,
+  Upload,
+  X,
+  ChevronLeft,
   ChevronRight,
   Package,
   Star,
@@ -144,12 +144,12 @@ const DEFAULT_FORM_STATE: ProductFormData = {
   tags: ""
 };
 
-const QUICK_SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
+
 
 export function ProductsManager() {
   const { t, locale, formatPrice, dir } = useI18n();
   const queryClient = useQueryClient();
-  
+
   // UI State
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
@@ -161,7 +161,7 @@ export function ProductsManager() {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [isUnsavedConfirmOpen, setIsUnsavedConfirmOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<any | null>(null);
-  
+
   // Form State
   const [formData, setFormData] = useState<ProductFormData>(DEFAULT_FORM_STATE);
   const [isDirty, setIsUnsaved] = useState(false);
@@ -183,12 +183,22 @@ export function ProductsManager() {
 
   const handleOpenModal = (product?: any) => {
     if (product) {
+      // Sort product sizes by position
+      const sortedSizes = product.product_sizes
+        ? [...product.product_sizes].sort((a: any, b: any) => (a.position || 0) - (b.position || 0))
+        : [];
+      
+      const hasOneSize = sortedSizes.length === 1 && sortedSizes[0].size_label === "One Size";
+      const mappedSizes = hasOneSize ? [] : sortedSizes.map((s: any) => s.size_label);
+
       // Map product to form data (simplified for mock)
       setFormData({
         ...DEFAULT_FORM_STATE,
         ...product,
         tags: product.tags?.join(", ") || "",
-        colors: product.colors || []
+        colors: product.colors || [],
+        sizes: mappedSizes,
+        has_one_size: hasOneSize
       });
     } else {
       setFormData(DEFAULT_FORM_STATE);
@@ -210,20 +220,25 @@ export function ProductsManager() {
     setIsUnsaved(true);
   };
 
-  const handleSave = (status: "active" | "inactive") => {
-    // Validate
+  const handleSave = async (status: "active" | "inactive") => {
     if (!formData.name_en || !formData.price || !formData.category_id) {
       toast.error(t.admin.products.modal.validation.required);
       return;
     }
-
-    const finalProduct = { ...formData, is_active: status === "active" };
-    console.log("Saving product:", finalProduct);
-    
-    toast.success(t.admin.common.success);
-    setIsModalOpen(false);
-    setIsUnsaved(false);
-    queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+    try {
+      if (formData.id) {
+        await adminApi.updateProduct(formData.id, formData, status);
+      } else {
+        await adminApi.createProduct(formData, status);
+      }
+      toast.success(t.admin.common.success);
+      setIsModalOpen(false);
+      setIsUnsaved(false);
+      queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+    } catch (e: any) {
+      toast.error(e?.message || "Failed to save product");
+      console.error(e);
+    }
   };
 
   const generateSKU = () => {
@@ -282,7 +297,7 @@ export function ProductsManager() {
     const newColors = [...formData.colors];
     const targetIndex = direction === "up" ? index - 1 : index + 1;
     if (targetIndex < 0 || targetIndex >= newColors.length) return;
-    
+
     const temp = newColors[index];
     newColors[index] = newColors[targetIndex];
     newColors[targetIndex] = temp;
@@ -290,6 +305,23 @@ export function ProductsManager() {
   };
 
   // --- Image Handlers ---
+  const handleImageUploadClick = (type: "general" | string) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        addImage(type, reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
+
   const addImage = (type: "general" | string, url: string) => {
     if (type === "general") {
       if (formData.general_images.length >= 10) {
@@ -305,7 +337,7 @@ export function ProductsManager() {
         return;
       }
       handleFormChange({
-        colors: formData.colors.map(c => 
+        colors: formData.colors.map(c =>
           c.id === type ? { ...c, images: [...c.images, url] } : c
         )
       });
@@ -336,7 +368,7 @@ export function ProductsManager() {
     if (!products) return [];
     let result = [...products].filter(p => {
       const searchLower = searchQuery.toLowerCase();
-      const matchesSearch = 
+      const matchesSearch =
         p.name_en?.toLowerCase().includes(searchLower) ||
         p.name_ar?.toLowerCase().includes(searchLower) ||
         p.name_tr?.toLowerCase().includes(searchLower);
@@ -370,8 +402,8 @@ export function ProductsManager() {
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground rtl:right-3 rtl:left-auto" />
-            <Input 
-              placeholder={t.admin.products.search} 
+            <Input
+              placeholder={t.admin.products.search}
               className="pl-10 rtl:pr-10 bg-background border-border"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -472,7 +504,7 @@ export function ProductsManager() {
                   {t.admin.products.modal.cancel}
                 </Button>
                 <Button onClick={() => handleSave("inactive")} variant="ghost" className="text-muted-foreground hover:text-foreground">
-                   {t.admin.products.modal.saveDraft}
+                  {t.admin.products.modal.saveDraft}
                 </Button>
                 <Button onClick={() => handleSave("active")} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold">
                   {t.admin.products.modal.publish}
@@ -483,7 +515,7 @@ export function ProductsManager() {
 
           <div className="flex-1 overflow-y-auto p-6 scrollbar-thin">
             <Accordion type="multiple" defaultValue={["basic"]} className="space-y-4">
-              
+
               {/* 1. Basic Info */}
               <AccordionItem value="basic" className="border border-border rounded-lg overflow-hidden bg-background/30">
                 <AccordionTrigger className="px-4 py-3 hover:no-underline">
@@ -507,7 +539,7 @@ export function ProductsManager() {
                       <Input value={formData.name_tr} onChange={(e) => handleFormChange({ name_tr: e.target.value })} className="bg-background border-border" />
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
                       <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.category}</Label>
@@ -523,8 +555,8 @@ export function ProductsManager() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                       <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.tags}</Label>
-                       <Input value={formData.tags} onChange={(e) => handleFormChange({ tags: e.target.value })} placeholder="Silk, Luxury, New" className="bg-background border-border" />
+                      <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.tags}</Label>
+                      <Input value={formData.tags} onChange={(e) => handleFormChange({ tags: e.target.value })} placeholder="Silk, Luxury, New" className="bg-background border-border" />
                     </div>
                   </div>
                 </AccordionContent>
@@ -564,19 +596,19 @@ export function ProductsManager() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                     <div className="space-y-2">
-                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.sku}</Label>
-                        <div className="flex gap-2">
-                          <Input value={formData.sku} onChange={(e) => handleFormChange({ sku: e.target.value })} className="bg-background border-border" />
-                          <Button variant="outline" size="icon" onClick={generateSKU} className="shrink-0 bg-background border-border">
-                            <RefreshCw className="h-4 w-4" />
-                          </Button>
-                        </div>
-                     </div>
-                     <div className="space-y-2">
-                        <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.weight}</Label>
-                        <Input type="number" value={formData.weight} onChange={(e) => handleFormChange({ weight: Number(e.target.value) })} className="bg-background border-border" />
-                     </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.sku}</Label>
+                      <div className="flex gap-2">
+                        <Input value={formData.sku} onChange={(e) => handleFormChange({ sku: e.target.value })} className="bg-background border-border" />
+                        <Button variant="outline" size="icon" onClick={generateSKU} className="shrink-0 bg-background border-border">
+                          <RefreshCw className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.weight}</Label>
+                      <Input type="number" value={formData.weight} onChange={(e) => handleFormChange({ weight: Number(e.target.value) })} className="bg-background border-border" />
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -624,28 +656,14 @@ export function ProductsManager() {
 
                     {!formData.has_one_size && (
                       <div className="space-y-4 animate-fade-in">
-                        <div className="flex flex-wrap gap-2">
-                          {QUICK_SIZES.map(size => (
-                            <Button 
-                              key={size} 
-                              type="button"
-                              variant={formData.sizes.includes(size) ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => toggleSize(size)}
-                              className="text-[10px] font-bold h-8 w-12"
-                            >
-                              {size}
-                            </Button>
-                          ))}
-                        </div>
-                        
                         <div className="flex gap-2 max-w-xs">
-                          <Input 
-                            placeholder={t.admin.products.modal.customSize} 
-                            value={customSize} 
+                          <Input
+                            type="number"
+                            placeholder="Add numeric size (e.g. 38)"
+                            value={customSize}
                             onChange={(e) => setCustomSize(e.target.value)}
                             onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomSize())}
-                            className="bg-background border-border text-[10px] h-8" 
+                            className="bg-background border-border text-[10px] h-8"
                           />
                           <Button variant="outline" size="sm" onClick={addCustomSize} className="h-8 shrink-0">
                             <PlusCircle className="h-3.5 w-3.5" />
@@ -653,7 +671,7 @@ export function ProductsManager() {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          {formData.sizes.filter(s => !QUICK_SIZES.includes(s)).map(size => (
+                          {formData.sizes.sort((a, b) => Number(a) - Number(b)).map(size => (
                             <Badge key={size} className="gap-1 px-2 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary/20">
                               {size}
                               <X className="h-3 w-3 cursor-pointer" onClick={() => toggleSize(size)} />
@@ -727,28 +745,28 @@ export function ProductsManager() {
                               <Input type="number" value={color.stock} onChange={(e) => updateColor(color.id, { stock: Number(e.target.value) })} className="h-8 text-xs bg-muted/30" />
                             </div>
                             <div className="flex items-center gap-3 pt-6">
-                               <Switch checked={color.is_active} onCheckedChange={(val) => updateColor(color.id, { is_active: val })} />
-                               <span className="text-[10px] uppercase font-bold text-muted-foreground">Available</span>
+                              <Switch checked={color.is_active} onCheckedChange={(val) => updateColor(color.id, { is_active: val })} />
+                              <span className="text-[10px] uppercase font-bold text-muted-foreground">Available</span>
                             </div>
                             <div className="flex items-center gap-3 pt-6">
-                               <Checkbox checked={color.is_main} onCheckedChange={(val) => updateColor(color.id, { is_main: !!val })} />
-                               <span className="text-[10px] uppercase font-bold text-muted-foreground">Main Color</span>
+                              <Checkbox checked={color.is_main} onCheckedChange={(val) => updateColor(color.id, { is_main: !!val })} />
+                              <span className="text-[10px] uppercase font-bold text-muted-foreground">Main Color</span>
                             </div>
                           </div>
-                          
+
                           {/* Color Gallery */}
                           <div className="space-y-2 pt-2">
                             <Label className="text-[8px] uppercase font-bold text-muted-foreground">Color Specific Images (Max 5)</Label>
                             <div className="flex flex-wrap gap-2">
-                               {color.images.map((img, idx) => (
-                                 <div key={idx} className="h-12 w-12 rounded border border-border relative overflow-hidden bg-muted">
-                                   <img src={img} className="h-full w-full object-cover" />
-                                   <button className="absolute top-0 right-0 bg-destructive text-white p-0.5" onClick={() => updateColor(color.id, { images: color.images.filter((_, i) => i !== idx) })}><X className="h-2 w-2" /></button>
-                                 </div>
-                               ))}
-                               <Button variant="outline" size="sm" className="h-12 w-12 border-dashed border-border" onClick={() => addImage(color.id, "/placeholder.svg")}>
-                                 <Upload className="h-4 w-4 text-muted-foreground" />
-                               </Button>
+                              {color.images.map((img, idx) => (
+                                <div key={idx} className="h-12 w-12 rounded border border-border relative overflow-hidden bg-muted">
+                                  <img src={img} className="h-full w-full object-cover" />
+                                  <button className="absolute top-0 right-0 bg-destructive text-white p-0.5" onClick={() => updateColor(color.id, { images: color.images.filter((_, i) => i !== idx) })}><X className="h-2 w-2" /></button>
+                                </div>
+                              ))}
+                              <Button variant="outline" size="sm" className="h-12 w-12 border-dashed border-border" onClick={() => handleImageUploadClick(color.id)}>
+                                <Upload className="h-4 w-4 text-muted-foreground" />
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -771,37 +789,45 @@ export function ProductsManager() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4 space-y-4 pt-2">
-                   <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.generalImages}</Label>
-                   <div 
+                  <Label className="text-[10px] uppercase tracking-widest text-muted-foreground font-bold">{t.admin.products.modal.generalImages}</Label>
+                  <div
                     className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:bg-muted/10 transition-colors cursor-pointer group"
                     onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => { e.preventDefault(); addImage("general", "/placeholder.svg"); }}
-                    onClick={() => addImage("general", "/placeholder.svg")}
-                   >
-                     <Upload className="h-8 w-8 mx-auto mb-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                     <p className="text-xs text-muted-foreground uppercase tracking-widest">Drag and drop images here, or click to upload</p>
-                     <p className="text-[10px] text-muted-foreground/60 mt-2">Maximum 10 images • JPG, PNG, WebP • Max 5MB each</p>
-                   </div>
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const file = e.dataTransfer.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => addImage("general", reader.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    onClick={() => handleImageUploadClick("general")}
+                  >
+                    <Upload className="h-8 w-8 mx-auto mb-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <p className="text-xs text-muted-foreground uppercase tracking-widest">Drag and drop images here, or click to upload</p>
+                    <p className="text-[10px] text-muted-foreground/60 mt-2">Maximum 10 images • JPG, PNG, WebP • Max 5MB each</p>
+                  </div>
 
-                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-                      {formData.general_images.map((img, idx) => (
-                        <Card key={idx} className="relative aspect-[3/4] bg-background border-border group overflow-hidden cursor-move">
-                           <img src={img} className="h-full w-full object-cover" />
-                           <div className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm h-5 w-5 flex items-center justify-center rounded text-[10px] font-bold border border-border">
-                             {idx + 1}
-                           </div>
-                           <button className="absolute top-2 right-2 h-5 w-5 bg-destructive text-white rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleFormChange({ general_images: formData.general_images.filter((_, i) => i !== idx) })}>
-                             <X className="h-3 w-3" />
-                           </button>
-                           {idx === 0 && (
-                             <div className="absolute bottom-0 left-0 right-0 bg-primary/90 text-primary-foreground py-1 text-[8px] text-center font-bold uppercase tracking-widest">
-                               {t.admin.products.modal.mainImage}
-                             </div>
-                           )}
-                           <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors pointer-events-none" />
-                        </Card>
-                      ))}
-                   </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                    {formData.general_images.map((img, idx) => (
+                      <Card key={idx} className="relative aspect-[3/4] bg-background border-border group overflow-hidden cursor-move">
+                        <img src={img} className="h-full w-full object-cover" />
+                        <div className="absolute top-2 left-2 bg-background/80 backdrop-blur-sm h-5 w-5 flex items-center justify-center rounded text-[10px] font-bold border border-border">
+                          {idx + 1}
+                        </div>
+                        <button className="absolute top-2 right-2 h-5 w-5 bg-destructive text-white rounded flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity" onClick={() => handleFormChange({ general_images: formData.general_images.filter((_, i) => i !== idx) })}>
+                          <X className="h-3 w-3" />
+                        </button>
+                        {idx === 0 && (
+                          <div className="absolute bottom-0 left-0 right-0 bg-primary/90 text-primary-foreground py-1 text-[8px] text-center font-bold uppercase tracking-widest">
+                            {t.admin.products.modal.mainImage}
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 transition-colors pointer-events-none" />
+                      </Card>
+                    ))}
+                  </div>
                 </AccordionContent>
               </AccordionItem>
 
@@ -820,59 +846,59 @@ export function ProductsManager() {
                       <TabsTrigger value="ar" className="text-[10px] uppercase font-bold px-4 tracking-widest">العربية</TabsTrigger>
                       <TabsTrigger value="tr" className="text-[10px] uppercase font-bold px-4 tracking-widest">Türkçe</TabsTrigger>
                     </TabsList>
-                    
+
                     {/* EN */}
                     <TabsContent value="en" className="space-y-4 animate-fade-in">
-                       <div className="space-y-2">
-                         <Label className="text-[10px] uppercase font-bold text-muted-foreground">{t.admin.products.modal.descEn}</Label>
-                         <Textarea value={formData.description_en} onChange={(e) => handleFormChange({ description_en: e.target.value })} className="h-32 bg-background border-border" />
-                       </div>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Material (EN)</Label>
-                            <Input value={formData.material_en} onChange={(e) => handleFormChange({ material_en: e.target.value })} className="bg-background border-border" />
-                         </div>
-                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Care Instructions (EN)</Label>
-                            <Textarea value={formData.care_instructions_en} onChange={(e) => handleFormChange({ care_instructions_en: e.target.value })} className="bg-background border-border" />
-                         </div>
-                       </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] uppercase font-bold text-muted-foreground">{t.admin.products.modal.descEn}</Label>
+                        <Textarea value={formData.description_en} onChange={(e) => handleFormChange({ description_en: e.target.value })} className="h-32 bg-background border-border" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold text-muted-foreground">Material (EN)</Label>
+                          <Input value={formData.material_en} onChange={(e) => handleFormChange({ material_en: e.target.value })} className="bg-background border-border" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold text-muted-foreground">Care Instructions (EN)</Label>
+                          <Textarea value={formData.care_instructions_en} onChange={(e) => handleFormChange({ care_instructions_en: e.target.value })} className="bg-background border-border" />
+                        </div>
+                      </div>
                     </TabsContent>
 
                     {/* AR */}
                     <TabsContent value="ar" className="space-y-4 animate-fade-in" dir="rtl">
-                       <div className="space-y-2 text-right">
-                         <Label className="text-[10px] uppercase font-bold text-muted-foreground">{t.admin.products.modal.descAr}</Label>
-                         <Textarea value={formData.description_ar} onChange={(e) => handleFormChange({ description_ar: e.target.value })} className="h-32 bg-background border-border" />
-                       </div>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
-                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">المادة (AR)</Label>
-                            <Input value={formData.material_ar} onChange={(e) => handleFormChange({ material_ar: e.target.value })} className="bg-background border-border text-right" />
-                         </div>
-                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">تعليمات العناية (AR)</Label>
-                            <Textarea value={formData.care_instructions_ar} onChange={(e) => handleFormChange({ care_instructions_ar: e.target.value })} className="bg-background border-border text-right" />
-                         </div>
-                       </div>
+                      <div className="space-y-2 text-right">
+                        <Label className="text-[10px] uppercase font-bold text-muted-foreground">{t.admin.products.modal.descAr}</Label>
+                        <Textarea value={formData.description_ar} onChange={(e) => handleFormChange({ description_ar: e.target.value })} className="h-32 bg-background border-border" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-right">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold text-muted-foreground">المادة (AR)</Label>
+                          <Input value={formData.material_ar} onChange={(e) => handleFormChange({ material_ar: e.target.value })} className="bg-background border-border text-right" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold text-muted-foreground">تعليمات العناية (AR)</Label>
+                          <Textarea value={formData.care_instructions_ar} onChange={(e) => handleFormChange({ care_instructions_ar: e.target.value })} className="bg-background border-border text-right" />
+                        </div>
+                      </div>
                     </TabsContent>
 
                     {/* TR */}
                     <TabsContent value="tr" className="space-y-4 animate-fade-in">
-                       <div className="space-y-2">
-                         <Label className="text-[10px] uppercase font-bold text-muted-foreground">{t.admin.products.modal.descTr}</Label>
-                         <Textarea value={formData.description_tr} onChange={(e) => handleFormChange({ description_tr: e.target.value })} className="h-32 bg-background border-border" />
-                       </div>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Materyal (TR)</Label>
-                            <Input value={formData.material_tr} onChange={(e) => handleFormChange({ material_tr: e.target.value })} className="bg-background border-border" />
-                         </div>
-                         <div className="space-y-2">
-                            <Label className="text-[10px] uppercase font-bold text-muted-foreground">Bakım Talimatları (TR)</Label>
-                            <Textarea value={formData.care_instructions_tr} onChange={(e) => handleFormChange({ care_instructions_tr: e.target.value })} className="bg-background border-border" />
-                         </div>
-                       </div>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] uppercase font-bold text-muted-foreground">{t.admin.products.modal.descTr}</Label>
+                        <Textarea value={formData.description_tr} onChange={(e) => handleFormChange({ description_tr: e.target.value })} className="h-32 bg-background border-border" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold text-muted-foreground">Materyal (TR)</Label>
+                          <Input value={formData.material_tr} onChange={(e) => handleFormChange({ material_tr: e.target.value })} className="bg-background border-border" />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-[10px] uppercase font-bold text-muted-foreground">Bakım Talimatları (TR)</Label>
+                          <Textarea value={formData.care_instructions_tr} onChange={(e) => handleFormChange({ care_instructions_tr: e.target.value })} className="bg-background border-border" />
+                        </div>
+                      </div>
                     </TabsContent>
                   </Tabs>
                 </AccordionContent>
@@ -887,7 +913,7 @@ export function ProductsManager() {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4 space-y-6 pt-2">
-                   <div className="flex items-center justify-between p-4 rounded-lg bg-primary/5 border border-primary/10">
+                  <div className="flex items-center justify-between p-4 rounded-lg bg-primary/5 border border-primary/10">
                     <div className="space-y-0.5">
                       <Label className="text-sm font-bold uppercase tracking-widest">{t.admin.products.modal.featured}</Label>
                       <p className="text-[10px] text-muted-foreground">Display this product on the boutique homepage</p>
@@ -902,21 +928,21 @@ export function ProductsManager() {
                         <SelectValue placeholder="Choose products..." />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border">
-                         {products?.filter(p => p.id !== formData.id).map((p: any) => (
-                           <SelectItem key={p.id} value={p.id}>{p.name_en}</SelectItem>
-                         ))}
+                        {products?.filter(p => p.id !== formData.id).map((p: any) => (
+                          <SelectItem key={p.id} value={p.id}>{p.name_en}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <div className="flex flex-wrap gap-2 mt-2">
-                       {formData.related_products.map(pid => {
-                         const p = products?.find(prod => prod.id === pid);
-                         return (
-                           <Badge key={pid} variant="outline" className="gap-1 border-border bg-background">
-                             {p?.name_en || pid}
-                             <X className="h-2.5 w-2.5 cursor-pointer" onClick={() => handleFormChange({ related_products: formData.related_products.filter(id => id !== pid) })} />
-                           </Badge>
-                         );
-                       })}
+                      {formData.related_products.map(pid => {
+                        const p = products?.find(prod => prod.id === pid);
+                        return (
+                          <Badge key={pid} variant="outline" className="gap-1 border-border bg-background">
+                            {p?.name_en || pid}
+                            <X className="h-2.5 w-2.5 cursor-pointer" onClick={() => handleFormChange({ related_products: formData.related_products.filter(id => id !== pid) })} />
+                          </Badge>
+                        );
+                      })}
                     </div>
                   </div>
                 </AccordionContent>
@@ -926,16 +952,16 @@ export function ProductsManager() {
           </div>
 
           <div className="p-4 border-t border-border bg-muted/20 flex justify-between items-center">
-             <div className="flex items-center gap-2">
-                <AlertCircle className="h-3 w-3 text-muted-foreground" />
-                <span className="text-[10px] uppercase text-muted-foreground tracking-widest">Changes are automatically drafted</span>
-             </div>
-             <div className="flex gap-3">
-                <Button variant="ghost" className="text-xs uppercase tracking-widest font-bold" onClick={handleCloseModalAttempt}>Discard Changes</Button>
-                <Button onClick={() => handleSave("active")} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold px-8 font-bold uppercase tracking-widest text-xs">
-                  {formData.id ? "Update & Publish" : t.admin.products.modal.publish}
-                </Button>
-             </div>
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-3 w-3 text-muted-foreground" />
+              <span className="text-[10px] uppercase text-muted-foreground tracking-widest">Changes are automatically drafted</span>
+            </div>
+            <div className="flex gap-3">
+              <Button variant="ghost" className="text-xs uppercase tracking-widest font-bold" onClick={handleCloseModalAttempt}>Discard Changes</Button>
+              <Button onClick={() => handleSave("active")} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-gold px-8 font-bold uppercase tracking-widest text-xs">
+                {formData.id ? "Update & Publish" : t.admin.products.modal.publish}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -955,10 +981,15 @@ export function ProductsManager() {
           </div>
           <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setIsDeleteConfirmOpen(false)} className="bg-background border-border">{t.admin.common.cancel}</Button>
-            <Button variant="destructive" onClick={() => {
-               queryClient.setQueryData(["admin", "products"], (old: any) => old.filter((p: any) => p.id !== productToDelete.id));
-               toast.success(t.admin.common.success);
-               setIsDeleteConfirmOpen(false);
+            <Button variant="destructive" onClick={async () => {
+              try {
+                await adminApi.deleteProduct(productToDelete.id);
+                queryClient.invalidateQueries({ queryKey: ["admin", "products"] });
+                toast.success(t.admin.common.success);
+                setIsDeleteConfirmOpen(false);
+              } catch (e) {
+                toast.error("Failed to delete product");
+              }
             }}>{t.admin.common.delete}</Button>
           </DialogFooter>
         </DialogContent>
