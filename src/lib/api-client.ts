@@ -47,24 +47,6 @@ export const apiClient = {
   },
 
   /**
-   * Newsletter subscription
-   */
-  async subscribeToNewsletter(email: string): Promise<ApiResponse> {
-    // Simulate backend call for development
-    if (!BACKEND_API_URL) {
-      console.log('Simulating Newsletter Subscription for:', email);
-      return new Promise((resolve) => 
-        setTimeout(() => resolve({ success: true }), 1000)
-      );
-    }
-    
-    return this.request('/api/newsletter/subscribe', {
-      method: 'POST',
-      body: JSON.stringify({ email }),
-    });
-  },
-
-  /**
    * Request email notification (backend handles actual sending)
    */
   async sendNotificationRequest(type: 'order_update' | 'promotion' | 'account_alert', payload: any): Promise<ApiResponse> {

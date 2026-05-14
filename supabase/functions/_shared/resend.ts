@@ -36,7 +36,7 @@ export async function sendEmail({
   return data;
 }
 
-export const elegantTemplate = (content: string, unsubscribeUrl?: string) => `
+export const elegantTemplate = (content: string) => `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -63,8 +63,7 @@ export const elegantTemplate = (content: string, unsubscribeUrl?: string) => `
         </div>
         <div class="footer">
             © ${new Date().getFullYear()} Royal Brands Fashion. All rights reserved.<br>
-            Timeless Luxury, Reimagined.<br>
-            ${unsubscribeUrl ? `<a href="${unsubscribeUrl}">Unsubscribe</a>` : ''}
+            Timeless Luxury, Reimagined.
         </div>
     </div>
 </body>

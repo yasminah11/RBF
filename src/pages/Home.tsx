@@ -4,10 +4,9 @@ import { useI18n, localizedField } from "@/i18n/I18nContext";
 import { ProductCard, type ProductCardData } from "@/components/ProductCard";
 import { Reveal } from "@/components/Reveal";
 import { Ornament } from "@/components/Ornament";
-import { header1, coverEmail } from "@/lib/assets";
+import { header1 } from "@/lib/assets";
 import { Award, ShieldCheck, CreditCard, ArrowRight, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 import { MOCK_PRODUCTS, MOCK_CATEGORIES, MOCK_REVIEWS, type Category } from "@/lib/constants";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -89,24 +88,6 @@ export default function Home() {
   const titleWords = t.hero.title.split(' ');
   const firstWord = titleWords[0];
   const restOfTitle = titleWords.slice(1).join(' ');
-
-  const [email, setEmail] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-
-  const onSubscribe = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || submitting) return;
-
-    setSubmitting(true);
-    // Mock subscription
-    setTimeout(() => {
-      toast.success(locale === 'ar' ? 'تم الانضمام بنجاح!' : locale === 'tr' ? 'Topluluğumuza katıldınız!' : 'Successfully joined our community!', {
-        description: locale === 'ar' ? 'تفقدي بريدك الإلكتروني للحصول على مفاجأة.' : 'Check your email for a welcome surprise.'
-      });
-      setEmail("");
-      setSubmitting(false);
-    }, 800);
-  };
 
   const heroImages = [header1];
 
@@ -270,59 +251,6 @@ export default function Home() {
               <Reveal delay={i * 80}><ProductCard p={p} /></Reveal>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Enhanced Responsive Newsletter Section */}
-      <section className="relative min-h-[60vh] md:min-h-[50vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={coverEmail}
-            alt="Royal World"
-            className="w-full h-full object-cover object-[center_30%] md:object-center"
-          />
-          <div className="absolute inset-0 bg-background/40 md:bg-background/50" />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background/60" />
-        </div>
-
-        <div className="container-luxury relative z-10 w-full py-8 md:py-12">
-          <Reveal>
-            <div className="max-w-2xl mx-auto text-center px-4">
-              <p className="text-xs sm:text-[10px] md:text-xs uppercase tracking-[0.5em] text-primary font-normal mb-4 drop-shadow-md">
-                {t.sections.newsletterTag}
-              </p>
-              <h2 className="font-display text-4xl sm:text-3xl md:text-6xl lg:text-7xl text-cream mb-4 tracking-tight leading-tight drop-shadow-lg">
-                {t.sections.newsletter}
-              </h2>
-              <p className="text-cream mb-10 max-w-md mx-auto leading-relaxed italic text-base sm:text-sm md:text-lg drop-shadow-sm font-light">
-                {t.sections.newsletterSub}
-              </p>
-
-              <form
-                onSubmit={onSubscribe}
-                className="flex flex-col sm:flex-row gap-0 max-w-md mx-auto border border-primary/30 rounded-none overflow-hidden bg-background/30 backdrop-blur-md shadow-2xl"
-              >
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={t.footer.emailPh}
-                  className="flex-1 bg-transparent border-none px-6 py-4 text-sm text-cream placeholder:text-cream/50 focus:outline-none focus:ring-0 transition-all text-center sm:text-start"
-                />
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-primary text-primary-foreground px-8 py-4 text-xs sm:text-[10px] uppercase tracking-[0.4em] font-bold hover:bg-primary-glow transition-all whitespace-nowrap border-t sm:border-t-0 sm:border-l border-primary/20 disabled:opacity-50"
-                >
-                  {submitting ? '...' : t.footer.subscribe}
-                </button>
-              </form>
-
-              <p className="mt-8 text-xs sm:text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-muted-foreground font-medium">
-                {t.sections.newsletterFoot}
-              </p>
-            </div>
-          </Reveal>
         </div>
       </section>
 

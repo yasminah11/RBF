@@ -144,10 +144,9 @@ async function saveImages(productId: string, images: string[]) {
 export const adminApi = {
   // ── Dashboard ──────────────────────────────────────────────────────────────
   getDashboardStats: async () => {
-    const [products, orders, users, revenue] = await Promise.all([
+    const [products, orders, revenue] = await Promise.all([
       supabase.from("products").select("id", { count: "exact" }),
       supabase.from("orders").select("id", { count: "exact" }),
-      supabase.from("subscribers").select("id", { count: "exact" }),
       supabase.from("orders").select("total_amount").eq("payment_status", "paid"),
     ]);
 
@@ -157,7 +156,6 @@ export const adminApi = {
     return {
       totalProducts: products.count || 0,
       totalOrders: orders.count || 0,
-      totalUsers: users.count || 0,
       totalRevenue,
     };
   },
@@ -315,16 +313,5 @@ export const adminApi = {
       .single();
     if (error) throw error;
     return data;
-  },
-
-  // ── Subscribers ────────────────────────────────────────────────────────────
-
-  getSubscribers: async () => {
-    const { data, error } = await supabase
-      .from("subscribers")
-      .select("*")
-      .order("created_at", { ascending: false });
-    if (error) throw error;
-    return data || [];
   },
 };

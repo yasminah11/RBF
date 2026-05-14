@@ -2,7 +2,6 @@ import {
   TrendingUp, 
   ShoppingBag, 
   ShoppingCart, 
-  Users, 
   ArrowUpRight, 
   ArrowDownRight,
   Package,
@@ -57,14 +56,6 @@ export function DashboardOverview() {
       value: stats?.totalProducts?.toString() || "0",
       subtitle: "Active products",
       icon: ShoppingBag
-    },
-    {
-      title: t.admin.dashboard.registeredUsers,
-      value: stats?.totalUsers?.toString() || "0",
-      subtitle: "New this week",
-      icon: Users,
-      trend: "up",
-      trendValue: "2.1%"
     }
   ];
 
@@ -76,7 +67,7 @@ export function DashboardOverview() {
       </div>
 
       {/* Stat Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {dashboardStats.map((stat, i) => (
           <Card key={i} className="bg-card border-border overflow-hidden relative group transition-all duration-300 hover:border-primary/50">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">

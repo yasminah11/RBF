@@ -15,7 +15,6 @@ import Wishlist from "./pages/Wishlist";
 import Checkout from "./pages/Checkout";
 import About from "./pages/About";
 import Auth from "./pages/Auth";
-import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 import Contact from "./pages/Contact";
 import FAQ from "./pages/FAQ";
@@ -28,7 +27,6 @@ import { DashboardOverview } from "./features/admin/pages/DashboardOverview";
 import { ProductsManager } from "./features/admin/pages/ProductsManager";
 import { OrdersManager } from "./features/admin/pages/OrdersManager";
 import { CategoriesManager } from "./features/admin/pages/CategoriesManager";
-import { SubscribersManager } from "./features/admin/pages/SubscribersManager";
 import { AdminSettings } from "./features/admin/pages/AdminSettings";
 
 const queryClient = new QueryClient();
@@ -49,7 +47,6 @@ const App = () => (
               <Route path="products" element={<ProductsManager />} />
               <Route path="orders" element={<OrdersManager />} />
               <Route path="categories" element={<CategoriesManager />} />
-              <Route path="subscribers" element={<SubscribersManager />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
 
@@ -64,7 +61,6 @@ const App = () => (
               <Route path="/checkout" element={<Checkout />} />
               <Route path="/about" element={<About />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/unsubscribe" element={<Unsubscribe />} />
             </Route>
 
             {/* Informational Routes */}
@@ -82,4 +78,3 @@ const App = () => (
   </QueryClientProvider>
 );
 export default App;
-
